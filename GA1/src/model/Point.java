@@ -21,18 +21,15 @@ public class Point {
     }
 
     //getter base - lascio privati
-    private double getX() {
-        return x;
-    }
-    private double getY() {
-        return y;
-    }
-    private double getRadius() {
-        return radius;
-    }
+    private double getX() { return x; }
+    private double getY() { return y; }
+    private double getRadius() { return radius; }
 
     //getter per la coppia di coordinate
-    public List<Double> getCoordinates() {
-        return Arrays.asList(getX(), getY());
+    public List<Double> getCoordinates() { return Arrays.asList(getX(), getY()); }
+
+    @Override
+    public String toString() {
+        return String.format("[%.4f, %.4f]", this.x, this.y);
     }
 }
