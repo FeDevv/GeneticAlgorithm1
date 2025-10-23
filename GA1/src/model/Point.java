@@ -23,7 +23,7 @@ public class Point {
     //getter base - lascio privati
     private double getX() { return x; }
     private double getY() { return y; }
-    private double getRadius() { return radius; }
+    public double getRadius() { return radius; }
 
     //getter per la coppia di coordinate
     public List<Double> getCoordinates() { return Arrays.asList(getX(), getY()); }
