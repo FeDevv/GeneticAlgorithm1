@@ -7,7 +7,7 @@ import java.util.List;
 
 public class fitnessFunction {
     /**
-     * Ogni cromosoma è un array di Point. Ogni point conosce la sua
+     * Ogni cromosoma (Individuo) è un array di Point. Ogni point conosce la sua
      * posizione e la sua distanza minima. Doppio ciclo per calcolare
      * la distanza di un punto da ogni altro punto.
      *

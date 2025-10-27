@@ -9,14 +9,16 @@ import java.util.*;
  * Selezionare i migliori individui per dare il via
  * a una nuova generazione
  * */
-public class Selection {
+public class EvolutionEngine {
 
     private final List<Individual> oldPopulation;
     private final int tournamentSize;
     private final double percent;
+    //private final double crossoverRate;
+    //private final double mutationRate;
 
     //costruttore generare oggetto selezione: questo oggetto permette di creare nuove generazioni
-    public Selection(List<Individual> oldPopulation, int tournamentSize, double percent) {
+    public EvolutionEngine(List<Individual> oldPopulation, int tournamentSize, double percent) {
         this.oldPopulation = oldPopulation;
         this.tournamentSize = tournamentSize;
         this.percent = percent;
