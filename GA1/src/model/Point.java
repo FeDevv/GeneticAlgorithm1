@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Point {
     //coordinate spaziali + raggio distanza
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
     private final double radius;
 
     //costruttore parziale per il posizionamento
@@ -15,8 +15,10 @@ public class Point {
         this.y = y;
         radius = Double.MAX_VALUE;
     }
-    //costruttore parziale per aggiungere il raggio
-    public Point(double radius) {
+    //costruttore totale per aggiungere il raggio
+    public Point(double x, double y, double radius) {
+        this.x = x;
+        this.y = y;
         this.radius = radius;
     }
 
