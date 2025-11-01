@@ -1,11 +1,14 @@
 package GA;
 
-public class EvolutionEngine {
+import model.Individual;
+import model.Point;
 
+import java.util.List;
 
-
-
-}
+/**
+ * Questa classe si occupa di coordinare le varie parti dell'algoritmo genetico
+ * */
+public class EvolutionEngine { }
 
 /*
 

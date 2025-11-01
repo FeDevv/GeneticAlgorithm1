@@ -4,6 +4,7 @@ import model.Individual;
 import model.Point;
 import utils.RandomUtils;
 
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 public class Mutation {
@@ -23,10 +24,9 @@ public class Mutation {
             if (RandomUtils.randDouble() < mutationProbability) {
                 Point oldPoint = I.getChromosomes().get(i);    //punto i dell'individuo, è stato scelto per essere mutato
                 double radius = oldPoint.getRadius();
-                List<Double> coordinates = oldPoint.getCoordinates();
 
-                double newX = coordinates.get(0) + (RandomUtils.randDouble() * 2 - 1) * mutationStrength;
-                double newY = coordinates.get(1) + (RandomUtils.randDouble() * 2 - 1) * mutationStrength;
+                double newX = oldPoint.getX() + (RandomUtils.randDouble() * 2 - 1) * mutationStrength;
+                double newY = oldPoint.getY() + (RandomUtils.randDouble() * 2 - 1) * mutationStrength;
 
                 Point newPoint = new Point(newX, newY, radius);
                 I.getChromosomes().set(i, newPoint);

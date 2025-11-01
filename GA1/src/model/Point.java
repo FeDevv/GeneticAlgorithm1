@@ -13,7 +13,7 @@ public class Point {
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
-        radius = Double.MAX_VALUE;
+        this.radius = Double.MAX_VALUE;
     }
     //costruttore totale per aggiungere il raggio
     public Point(double x, double y, double radius) {
@@ -23,8 +23,8 @@ public class Point {
     }
 
     //getter base - lascio privati
-    private double getX() { return x; }
-    private double getY() { return y; }
+    public double getX() { return x; }
+    public double getY() { return y; }
     public double getRadius() { return radius; }
 
     //getter per la coppia di coordinate
