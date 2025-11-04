@@ -9,12 +9,27 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomUtils {
 
+    // ------------------- ATTRIBUTI -------------------
+
+    // Generatore principale di numeri casuali.
+    // Nota: L'uso di una singola istanza 'static final' di Random è thread-safe
+    // per la maggior parte dei casi d'uso, ma introduce contesa.
     private static final Random random = new Random();
 
+    // ------------------- METODI DI UTILITÀ -------------------
+
+    /**
+     * Genera un elenco di 'n' indici univoci compresi tra 0 (incluso) e 'maxExclusive' (escluso).
+     * Usato principalmente per la Selezione per Torneo (tournament selection).
+     * @param n Il numero di indici univoci da generare (tournament size).
+     * @param maxExclusive Il limite superiore del range (es. la dimensione della popolazione).
+     * @return Una List<Integer> di indici univoci.
+     * * Scelta Implementativa: Usa un HashSet per garantire l'univocità con complessità O(1) per l'aggiunta.
+     */
     public static List<Integer> UniqueIndices(int n, int maxExclusive) {
         Set<Integer> uniqueIndices = new HashSet<>();
 
-        //genera numeri fino a che il Set non ha k elementi
+        // Continua a generare numeri casuali finché il Set non raggiunge la dimensione desiderata (n).
         while (uniqueIndices.size() < n) {
             uniqueIndices.add(random.nextInt(maxExclusive));
         }
@@ -22,23 +37,43 @@ public class RandomUtils {
         return new ArrayList<>(uniqueIndices);
     }
 
+    /**
+     * Simula un lancio di moneta.
+     * @return 0 o 1.
+     * Usato per decisioni binarie (es. Uniform Crossover).
+     */
     public static int CoinToss() {
         return random.nextInt(2);
     }
 
+    /**
+     * Genera un numero double casuale tra [0.0 (incluso) e 1.0 (escluso)).
+     * Usato principalmente per controllare le probabilità (es. probabilità di Crossover o Mutazione).
+     */
     public static double randDouble() {
         return random.nextDouble();
-        // il numero generato è in [0.0 , 0.9999...] ossia tra [0.0 , 1)
     }
 
-    //genera i punti nel bounding box, per la prima generazione di individui
-    public static Point insideBoxGenerator(Rectangle2D boundingBox) {
-        double randomXfactor = ThreadLocalRandom.current().nextDouble();    //double tra 0.0 e 1.0 escluso
+    /**
+     * Genera un nuovo oggetto Point posizionato casualmente all'interno del Bounding Box del dominio.
+     * Questo metodo è cruciale per l'inizializzazione della prima generazione.
+     * @param boundingBox Il rettangolo che definisce i limiti massimi (es. Rectangle2D).
+     * @param radius Il raggio dell'oggetto Point da creare.
+     * @return Un nuovo oggetto Point posizionato casualmente.
+     * * Scelta Implementativa: Uso di ThreadLocalRandom.
+     * Questa è una scelta **eccellente** per la thread safety e le prestazioni in ambienti concorrenti
+     * (anche se l'AG non è parallelo, è una buona pratica per le utility statiche).
+     */
+    public static Point insideBoxGenerator(Rectangle2D boundingBox, double radius) {
+        // Genera due fattori casuali per X e Y tra [0.0 e 1.0).
+        double randomXfactor = ThreadLocalRandom.current().nextDouble();
         double randomYfactor = ThreadLocalRandom.current().nextDouble();
 
+        // Mappatura lineare per ottenere la coordinata X all'interno del range [MinX, MaxX]
         double x = boundingBox.getMinX() + (randomXfactor * boundingBox.getWidth());
+        // Mappatura lineare per ottenere la coordinata Y all'interno del range [MinY, MaxY]
         double y = boundingBox.getMinY() + (randomYfactor * boundingBox.getHeight());
 
-        return new Point(x,y);
+        return new Point(x,y,radius);
     }
 }

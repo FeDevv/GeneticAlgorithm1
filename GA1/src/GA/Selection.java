@@ -11,64 +11,83 @@ import java.util.*;
  * */
 public class Selection {
 
-    private final List<Individual> oldPopulation;
-    private final int tournamentSize;
-    private final double percent;
-    //private final double crossoverRate;
-    //private final double mutationRate;
+    // ------------------- ATTRIBUTI (Parametri di Configurazione) -------------------
 
-    //costruttore generare oggetto selezione: questo oggetto permette di creare nuove generazioni
+    // Riferimento alla popolazione della generazione precedente.
+    private final List<Individual> oldPopulation;
+
+    // Il numero di individui che partecipano a ogni torneo.
+    private final int tournamentSize;
+
+    // La percentuale della popolazione da considerare élite (es. 0.05 per 5%).
+    private final double percent;
+
+    // ------------------- COSTRUTTORE -------------------
+
+    /**
+     * Costruttore: prepara l'oggetto Selezione con la popolazione su cui operare e i parametri.
+     * @param oldPopulation La popolazione della generazione precedente.
+     * @param tournamentSize La dimensione N del torneo.
+     * @param percent La percentuale di individui da preservare come élite.
+     * * Scelta Implementativa: Uso di Collections.unmodifiableList().
+     * **Sicurezza:** Questo garantisce che la popolazione passata sia trattata come **immutabile** * all'interno di questa classe, impedendo modifiche esterne durante l'esecuzione della selezione.
+     */
     public Selection(List<Individual> oldPopulation, int tournamentSize, double percent) {
-        this.oldPopulation = oldPopulation;
+        this.oldPopulation = Collections.unmodifiableList(oldPopulation);
         this.tournamentSize = tournamentSize;
         this.percent = percent;
     }
 
+    // ------------------- METODI DI SELEZIONE -------------------
+
     /**
-     * Seleziona i migliori individui di una generazione cosi da ricopiarli nella prossima generazione.
-     * Tramite percent voglio prendere i migliori X% del totale (soluzioni piu grandi prendono piu individui)
-     * @return ritorna la lista dei migliori (non in ordine)
-     * */
-    private List<Individual> selectElites() {
+     * Implementa la strategia di **Elitismo**: seleziona i migliori X% degli individui
+     * da copiare direttamente nella prossima generazione (non-degeneration strategy).
+     * @return Una lista contenente i riferimenti agli individui élite.
+     * * Scelta Implementativa: Uso di PriorityQueue.
+     * La PriorityQueue mantiene solo i k migliori (dove k è eliteSize), con una complessità efficiente O(N log k).
+     */
+    public List<Individual> selectElites() {
         int populationSize = oldPopulation.size();
+        // Calcola la dimensione degli élite, garantendo che sia almeno 1.
         int eliteSize = Math.max(1 , (int)Math.floor(populationSize * percent));
 
+        // Inizializza la coda di priorità. Il Comparator garantisce che il 'peggiore tra i migliori'
+        // sia in testa (elites.peek()) per essere rimosso se ne subentra uno migliore.
         PriorityQueue<Individual> elites = new PriorityQueue<>(eliteSize, Comparator.comparingDouble(Individual::getFitness));
 
         for (Individual ind : oldPopulation) {
             if (elites.size() < eliteSize) {
                 elites.offer(ind);
-                // L'IDE potrebbe segnalare un potenziale NullPointerException su peek(),
-                // ma è un falso positivo. Questo blocco 'else if' viene eseguito solo
-                // quando la coda è piena (size == eliteSize).
-                // Dato che eliteSize è garantito essere >= 1 (da Math.max),
-                // la coda non sarà mai vuota in questo punto, quindi peek() è sicuro.
-                // linea di codice prima: else if (ind.getFitness() > elites.peek().getFitness())
             } else if (ind.getFitness() > Objects.requireNonNull(elites.peek()).getFitness()) {
-                //Rimuovi il peggiore tra i migliori
+                // Rimuovi il peggiore tra gli élite (che è in testa alla coda)
                 elites.poll();
-                //inserisci il record breaker
+                // Inserisci il nuovo individuo migliore
                 elites.offer(ind);
             }
         }
 
+        // Converte la PriorityQueue in una List e la restituisce.
         return elites.stream().toList();
     }
 
     /**
-     * Torneo tra N individui, viene selezionato solo il migliore.
-     * Usato per cercare il padre e la madre.
-     * @return winner, il migliore dei partecipanti
-     * */
-    private Individual tournament() {
+     * Implementa la **Selezione per Torneo**: estrae N individui a caso e sceglie il migliore.
+     * Questo metodo viene usato per selezionare i due genitori (padre e madre) per il crossover.
+     * @return L'individuo vincitore del torneo (quello con la fitness più alta).
+     * * Scelta Implementativa: Utilizzo di RandomUtils.UniqueIndices.
+     * Assicura che la selezione degli N partecipanti sia casuale e senza duplicati.
+     */
+    public Individual tournament() {
+        // Estrae N indici univoci dalla popolazione
         List<Integer> indices = RandomUtils.UniqueIndices(tournamentSize, oldPopulation.size());
         List<Individual> participants = new ArrayList<>();
 
         for (int i : indices) {
-            //prendi i 'tournamentSize' individui random
             participants.add(oldPopulation.get(i));
         }
 
+        // Trova il vincitore tra i partecipanti (il migliore ha la fitness più alta)
         Individual winner = participants.getFirst();
         for (Individual individual : participants) {
             if (winner.getFitness() < individual.getFitness()) {
