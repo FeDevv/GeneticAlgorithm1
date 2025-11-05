@@ -7,6 +7,8 @@ import utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Questo è il controller dell'evoluzione, esegue in maniera ordinata
@@ -143,6 +145,7 @@ public class EvolutionEngine {
         // --- Fase 2: Ciclo di Evoluzione ---
         for (int i = 0; i < generations; i++) {
 
+            final List<Individual> currentGeneration = oldGeneration;
             List<Individual> newGeneration = new ArrayList<>(populationSize);
 
             // 1. Elitismo: seleziona i migliori della generazione precedente.
@@ -152,31 +155,36 @@ public class EvolutionEngine {
             // 2. Crossover e Mutazione: riempie il resto della popolazione.
             int childrenToGenerate = populationSize - elites.size();
 
-            for (int j = 0; j < childrenToGenerate; j++) {
-                /**
-                 * POTENTIALLY EACH OPERATION INSEDE THIS LOOP COULD BE PARALLELIZED THROUGH MULTITHREADING
-                 * */
-                // Selezione genitori tramite torneo
-                Individual dad = selector.tournament(oldGeneration);
-                Individual mom = selector.tournament(oldGeneration);
-                while (mom == dad) { // Assicura che i genitori siano individui distinti (per un crossover efficace)
-                    mom = selector.tournament(oldGeneration);
-                }
+            // Genera i figli in parallelo e raccoglili in una lista temporanea
+            List<Individual> children = IntStream.range(0, childrenToGenerate)
+                .parallel() // L'operazione chiave per eseguire i passi successivi in parallelo
+                .mapToObj(j -> {
+                    // --- Operazioni di creazione del singolo figlio (Eseguite in parallelo su core diversi) ---
 
-                // Crossover
-                Individual child = mixer.uniformCrossover(mom, dad);
+                    // a. Selezione di genitori distinti (Nota: il while non è efficiente in AG ma è thread-safe)
+                    Individual dad = selector.tournament(currentGeneration);
+                    Individual mom = selector.tournament(currentGeneration);
+                    while (mom == dad) {
+                        mom = selector.tournament(currentGeneration);
+                    }
 
-                // Mutazione
-                // L'oggetto Domain è necessario qui per il soft-clamping all'interno di Mutation.
-                gammaRays.mutate(child);
+                    // b. Crossover
+                    Individual child = mixer.uniformCrossover(mom, dad);
 
-                // Calcola fitness del figlio e lo aggiunge alla nuova generazione.
-                child.setFitness(fitnessCalculator.getFitness(child));
-                /**
-                 * SINCE THIS IS THE COMMON ELEMENT BETWEEN THREADS, IT SHOULD BE PROTECTED
-                 * */
-                newGeneration.add(child);
-            }
+                    // c. Mutazione
+                    gammaRays.mutate(child);
+
+                    // d. Calcolo Fitness (uso di fitnessCalculator.getFitness() thread-safe)
+                    child.setFitness(fitnessCalculator.getFitness(child));
+
+                    // Ritorna l'oggetto creato
+                    return child;
+                })
+                // La funzione collect() si occupa di raccogliere in modo thread-safe tutti i risultati
+                .toList(); //genera lista immutabile
+
+            // Aggiungi tutti i figli generati in parallelo alla newGeneration
+            newGeneration.addAll(children);
 
             // 3. Aggiornamento: Verifica il record globale (Elitismo Globale).
             solution = currentBestSolution(newGeneration, solution);

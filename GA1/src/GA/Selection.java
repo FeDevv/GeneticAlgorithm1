@@ -17,20 +17,20 @@ public class Selection {
     private final int tournamentSize;
 
     // La percentuale della popolazione da considerare élite (es. 0.05 per 5%).
-    private final double percent;
+    private final double elitesPercentage;
 
     // ------------------- COSTRUTTORE -------------------
 
     /**
      * Costruttore: prepara l'oggetto Selezione con la popolazione su cui operare e i parametri.
      * @param tournamentSize La dimensione N del torneo.
-     * @param percent La percentuale di individui da preservare come élite.
+     * @param elitesPercentage La percentuale di individui da preservare come élite.
      * * Scelta Implementativa: Uso di Collections.unmodifiableList().
      * **Sicurezza:** Questo garantisce che la popolazione passata sia trattata come **immutabile** * all'interno di questa classe, impedendo modifiche esterne durante l'esecuzione della selezione.
      */
-    public Selection(int tournamentSize, double percent) {
+    public Selection(int tournamentSize, double elitesPercentage) {
         this.tournamentSize = tournamentSize;
-        this.percent = percent;
+        this.elitesPercentage = elitesPercentage;
     }
 
     // ------------------- METODI DI SELEZIONE -------------------
@@ -45,7 +45,7 @@ public class Selection {
     public List<Individual> selectElites(List<Individual> oldPopulation) {
         int populationSize = oldPopulation.size();
         // Calcola la dimensione degli élite, garantendo che sia almeno 1.
-        int eliteSize = Math.max(1 , (int)Math.floor(populationSize * percent));
+        int eliteSize = Math.max(1 , (int)Math.floor(populationSize * elitesPercentage));
 
         // Inizializza la coda di priorità. Il Comparator garantisce che il 'peggiore tra i migliori'
         // sia in testa (elites.peek()) per essere rimosso se ne subentra uno migliore.

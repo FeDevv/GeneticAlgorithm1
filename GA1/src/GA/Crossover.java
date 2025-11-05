@@ -40,7 +40,7 @@ public class Crossover {
      */
     public Individual uniformCrossover(Individual I1, Individual I2) {
         int lenght = I1.getDimension();
-        List<Point> childChromosomes = new ArrayList<Point>(lenght);
+        List<Point> childChromosomes = new ArrayList<>(lenght);
 
         // 1. Controlla se il Crossover deve avvenire (probabilità di ricombinazione).
         if(RandomUtils.randDouble() < CrossoverProbability) {
