@@ -13,9 +13,6 @@ public class Selection {
 
     // ------------------- ATTRIBUTI (Parametri di Configurazione) -------------------
 
-    // Riferimento alla popolazione della generazione precedente.
-    private final List<Individual> oldPopulation;
-
     // Il numero di individui che partecipano a ogni torneo.
     private final int tournamentSize;
 
@@ -26,14 +23,12 @@ public class Selection {
 
     /**
      * Costruttore: prepara l'oggetto Selezione con la popolazione su cui operare e i parametri.
-     * @param oldPopulation La popolazione della generazione precedente.
      * @param tournamentSize La dimensione N del torneo.
      * @param percent La percentuale di individui da preservare come élite.
      * * Scelta Implementativa: Uso di Collections.unmodifiableList().
      * **Sicurezza:** Questo garantisce che la popolazione passata sia trattata come **immutabile** * all'interno di questa classe, impedendo modifiche esterne durante l'esecuzione della selezione.
      */
-    public Selection(List<Individual> oldPopulation, int tournamentSize, double percent) {
-        this.oldPopulation = Collections.unmodifiableList(oldPopulation);
+    public Selection(int tournamentSize, double percent) {
         this.tournamentSize = tournamentSize;
         this.percent = percent;
     }
@@ -47,7 +42,7 @@ public class Selection {
      * * Scelta Implementativa: Uso di PriorityQueue.
      * La PriorityQueue mantiene solo i k migliori (dove k è eliteSize), con una complessità efficiente O(N log k).
      */
-    public List<Individual> selectElites() {
+    public List<Individual> selectElites(List<Individual> oldPopulation) {
         int populationSize = oldPopulation.size();
         // Calcola la dimensione degli élite, garantendo che sia almeno 1.
         int eliteSize = Math.max(1 , (int)Math.floor(populationSize * percent));
@@ -78,7 +73,7 @@ public class Selection {
      * * Scelta Implementativa: Utilizzo di RandomUtils.UniqueIndices.
      * Assicura che la selezione degli N partecipanti sia casuale e senza duplicati.
      */
-    public Individual tournament() {
+    public Individual tournament(List<Individual> oldPopulation) {
         // Estrae N indici univoci dalla popolazione
         List<Integer> indices = RandomUtils.UniqueIndices(tournamentSize, oldPopulation.size());
         List<Individual> participants = new ArrayList<>();

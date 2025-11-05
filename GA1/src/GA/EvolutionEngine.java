@@ -44,31 +44,16 @@ public class EvolutionEngine {
     // Numero massimo di iterazioni (cicli) evolutivi.
     private final int generations;
 
-    // Dimensione N per la selezione per torneo.
-    private final int tournamentSize;
-
-    // Percentuale della popolazione da copiare direttamente (strategia di elitismo).
-    private final double elitesPercentage;
-
-    // Probabilità di ricombinazione.
-    private final double crossoverProbability;
-
-    // Probabilità che un singolo gene muti.
-    private final double mutationProbability;
-
-    // L'ampiezza massima della perturbazione della mutazione.
-    private final double mutationStrenght;
-
     // Il raggio (dimensione) dei punti che compongono gli individui.
     private final double radius;
 
     // ------------------- SERVIZI E STATO -------------------
 
-    // Il calcolatore di fitness, inizializzato una volta sola (servizio immutabile).
+    // services
     private final FitnessCalculator fitnessCalculator;
-
-    // Riferimento al miglior individuo (soluzione) trovato in tutte le generazioni (stato mutabile).
-    private Individual solution;
+    private final Mutation gammaRays;
+    private final Crossover mixer;
+    private final Selection selector;
 
     // ==================================================================================
     // 🔨 COSTRUTTORE
@@ -84,15 +69,21 @@ public class EvolutionEngine {
         this.populationSize = populationSize;
         this.individualSize = individualSize;
         this.generations = generations;
-        this.tournamentSize = tournamentSize;
-        this.elitesPercentage = elitesPercentage;
-        this.crossoverProbability = crossoverProbability;
-        this.mutationStrenght = mutationStrenght;
-        this.mutationProbability = mutationProbability;
         this.radius = radius;
+        // tournamentSize --> Dimensione N per la selezione per torneo.
+        // elitesPercentage --> Percentuale della popolazione da copiare direttamente (strategia di elitismo).
+        // crossoverProbability --> Probabilità di ricombinazione.
+        // mutationStrenght --> L'ampiezza massima della perturbazione della mutazione.
+        // mutationProbability --> Probabilità che un singolo gene muti.
 
-        // Inizializza il servizio FitnessCalculator, che è costante per tutta l'esecuzione.
+        // Non serve memorizzare questi parametri che ho commentato, in quanto servono solo all'inizializzazione del controller
+        // verranno salvati nelle classi di servizio corrispondenti.
+
+        // Inizializzazione dei servizi, sono costanti per tutta l'esecuzione. Unica istanza.
         this.fitnessCalculator = new FitnessCalculator(domain);
+        this.gammaRays = new Mutation(mutationProbability, mutationStrenght, domain);
+        this.mixer = new Crossover(crossoverProbability);
+        this.selector = new Selection(tournamentSize, elitesPercentage);
     }
 
     // ==================================================================================
@@ -132,14 +123,19 @@ public class EvolutionEngine {
      * @return Una copia della migliore soluzione trovata globalmente.
      */
     public Individual reproduce() {
+        // tengo traccia del miglior individuo
+        Individual solution;
 
         // --- Fase 1: Inizializzazione ---
         List<Individual> oldGeneration = firstGeneration();
 
         // Calcola la fitness iniziale per l'intera popolazione.
-        for (Individual ind : oldGeneration) {
+
+        // Esegui la valutazione della fitness su core CPU multipli
+        oldGeneration.parallelStream().forEach(ind -> {
+            // La lambda expression (ind -> ...) viene eseguita in parallelo
             ind.setFitness(fitnessCalculator.getFitness(ind));
-        }
+        });
 
         // Stabilisce la prima soluzione globale migliore.
         solution = currentBestSolution(oldGeneration, null);
@@ -148,36 +144,37 @@ public class EvolutionEngine {
         for (int i = 0; i < generations; i++) {
 
             List<Individual> newGeneration = new ArrayList<>(populationSize);
-            // Inizializza l'operatore di Selezione per la generazione corrente.
-            Selection selection = new Selection(oldGeneration, tournamentSize, elitesPercentage);
 
             // 1. Elitismo: seleziona i migliori della generazione precedente.
-            List<Individual> elites = selection.selectElites();
+            List<Individual> elites = selector.selectElites(oldGeneration);
             newGeneration.addAll(elites);
 
             // 2. Crossover e Mutazione: riempie il resto della popolazione.
             int childrenToGenerate = populationSize - elites.size();
 
             for (int j = 0; j < childrenToGenerate; j++) {
-
+                /**
+                 * POTENTIALLY EACH OPERATION INSEDE THIS LOOP COULD BE PARALLELIZED THROUGH MULTITHREADING
+                 * */
                 // Selezione genitori tramite torneo
-                Individual dad = selection.tournament();
-                Individual mom = selection.tournament();
+                Individual dad = selector.tournament(oldGeneration);
+                Individual mom = selector.tournament(oldGeneration);
                 while (mom == dad) { // Assicura che i genitori siano individui distinti (per un crossover efficace)
-                    mom = selection.tournament();
+                    mom = selector.tournament(oldGeneration);
                 }
 
                 // Crossover
-                Crossover crossover = new Crossover(crossoverProbability);
-                Individual child = crossover.uniformCrossover(mom, dad);
+                Individual child = mixer.uniformCrossover(mom, dad);
 
                 // Mutazione
                 // L'oggetto Domain è necessario qui per il soft-clamping all'interno di Mutation.
-                Mutation mutation = new Mutation(mutationProbability, mutationStrenght, domain);
-                mutation.mutate(child);
+                gammaRays.mutate(child);
 
                 // Calcola fitness del figlio e lo aggiunge alla nuova generazione.
                 child.setFitness(fitnessCalculator.getFitness(child));
+                /**
+                 * SINCE THIS IS THE COMMON ELEMENT BETWEEN THREADS, IT SHOULD BE PROTECTED
+                 * */
                 newGeneration.add(child);
             }
 
