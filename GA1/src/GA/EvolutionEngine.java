@@ -65,7 +65,7 @@ public class EvolutionEngine {
      * Costruttore completo per configurare tutti i parametri dell'algoritmo genetico.
      */
     public EvolutionEngine(Domain domain, int populationSize, int individualSize, int generations, int tournamentSize, double elitesPercentage,
-                           double crossoverProbability, double mutationProbability, double mutationStrenght, double radius) {
+                           double crossoverProbability, double mutationProbability, double initialMutationStrenght, double radius) {
         // Inizializza tutti gli attributi finali di configurazione.
         this.domain = domain;
         this.populationSize = populationSize;
@@ -83,7 +83,7 @@ public class EvolutionEngine {
 
         // Inizializzazione dei servizi, sono costanti per tutta l'esecuzione. Unica istanza.
         this.fitnessCalculator = new FitnessCalculator(domain);
-        this.gammaRays = new Mutation(mutationProbability, mutationStrenght, domain);
+        this.gammaRays = new Mutation(mutationProbability, initialMutationStrenght, domain, generations);
         this.mixer = new Crossover(crossoverProbability);
         this.selector = new Selection(tournamentSize, elitesPercentage);
     }
@@ -156,6 +156,7 @@ public class EvolutionEngine {
             int childrenToGenerate = populationSize - elites.size();
 
             // Genera i figli in parallelo e raccoglili in una lista temporanea
+            final int currentGenerationAge = i;
             List<Individual> children = IntStream.range(0, childrenToGenerate)
                 .parallel() // L'operazione chiave per eseguire i passi successivi in parallelo
                 .mapToObj(j -> {
@@ -172,7 +173,7 @@ public class EvolutionEngine {
                     Individual child = mixer.uniformCrossover(mom, dad);
 
                     // c. Mutazione
-                    gammaRays.mutate(child);
+                    gammaRays.mutate(child, currentGenerationAge);
 
                     // d. Calcolo Fitness (uso di fitnessCalculator.getFitness() thread-safe)
                     child.setFitness(fitnessCalculator.getFitness(child));

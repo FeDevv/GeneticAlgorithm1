@@ -5,9 +5,6 @@ import model.Point;
 import model.domains.Domain;
 import utils.RandomUtils;
 
-import java.awt.geom.Rectangle2D;
-import java.util.List;
-
 public class Mutation {
 
     // ------------------- ATTRIBUTI (Parametri di Configurazione) -------------------
@@ -16,24 +13,28 @@ public class Mutation {
     private final double mutationProbability;
 
     // L'ampiezza massima della perturbazione applicata alle coordinate X e Y.
-    private final double mutationStrength;
+    private final double initialMutationStrength;
 
     // Riferimento al dominio per ottenere i limiti (Bounding Box) per il clamping.
     private final Domain domain;
+
+    //
+    private final int totalGenerations;
 
     // ------------------- COSTRUTTORE -------------------
 
     /**
      * Costruisce l'operatore di Mutazione con i parametri di controllo e il dominio.
      * @param mutationProbability La probabilità che la mutazione avvenga su un gene.
-     * @param mutationStrength L'entità della perturbazione.
+     * @param initialMutationStrength L'entità della perturbazione.
      * @param domain Il riferimento al dominio del problema.
      * * Scelta Implementativa: L'uso di 'final' per tutti i campi garantisce l'immutabilità della configurazione.
      */
-    public Mutation(double mutationProbability, double mutationStrength, Domain domain) {
+    public Mutation(double mutationProbability, double initialMutationStrength, Domain domain, int totalGenerations) {
         this.mutationProbability = mutationProbability;
-        this.mutationStrength = mutationStrength;
+        this.initialMutationStrength = initialMutationStrength;
         this.domain = domain;
+        this.totalGenerations = totalGenerations;
     }
 
     // ------------------- METODO PRINCIPALE -------------------
@@ -43,7 +44,9 @@ public class Mutation {
      * Il processo è in-place, modificando l'individuo passato come parametro.
      * @param I L'individuo da mutare.
      */
-    public void mutate(Individual I) {
+    public void mutate(Individual I, int currentGeneration) {
+
+        double adaptiveStrenght = calculateAdaptiveStrength(currentGeneration);
 
         // Estrae i limiti della Bounding Box (il rettangolo che contiene il dominio).
         // Questo viene fatto una volta per l'efficienza.
@@ -64,8 +67,8 @@ public class Mutation {
 
                 // Calcola la perturbazione casuale (Mutazione Gaussiana / Creep Mutation).
                 // (RandomUtils.randDouble() * 2 - 1) genera un valore tra [-1.0, 1.0).
-                double newX = oldPoint.getX() + (RandomUtils.randDouble() * 2 - 1) * mutationStrength;
-                double newY = oldPoint.getY() + (RandomUtils.randDouble() * 2 - 1) * mutationStrength;
+                double newX = oldPoint.getX() + (RandomUtils.randDouble() * 2 - 1) * adaptiveStrenght;
+                double newY = oldPoint.getY() + (RandomUtils.randDouble() * 2 - 1) * adaptiveStrenght;
 
                 // 🌟 APPLICAZIONE DEL SOFT-CLAMPING
                 // Forza le coordinate all'interno dei limiti della Bounding Box.
@@ -94,5 +97,18 @@ public class Mutation {
      */
     private double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
+    }
+
+    private double calculateAdaptiveStrength(int g) {
+        // Per evitare divisione per zero se g=0, usiamo (g + 1).
+        // Il fattore di decadimento (1.0 + (double)g / totalGenerations) è una scelta comune.
+
+        // Esempio 1: Decadimento Lineare (Raggiunge 0 alla fine)
+        // double decayFactor = 1.0 - ((double)g / this.totalGenerations);
+        // return this.initialStrength * Math.max(0.01, decayFactor); // Minimo 0.01
+
+        // Esempio 2: Decadimento Inverso (Mantiene un valore minimo)
+        return this.initialMutationStrength / (1.0 + 5.0 * ((double)g / this.totalGenerations));
+        // 5.0 è una costante che regola quanto velocemente la forza decade.
     }
 }
