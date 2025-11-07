@@ -1,8 +1,13 @@
-package model.domains;
+package model.domains.types;
+
+import model.Individual;
+import model.Point;
+import model.domains.Domain;
 
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
-public class RectangularDomain implements Domain{
+public class RectangularDomain implements Domain {
 
     // ------------------- ATTRIBUTI -------------------
 
@@ -44,6 +49,15 @@ public class RectangularDomain implements Domain{
     public boolean isPointInside(double x, double y) {
         return x >= -width / 2 && x <= width / 2 &&
                 y >= -height / 2 && y <= height / 2;
+    }
+
+    @Override
+    public boolean isValidIndividual(Individual individual) {
+        List<Point> points = individual.getChromosomes();
+        for (Point p : points) {
+            if (!isPointInside(p.getX(), p.getY())) { return false; }
+        }
+        return true;
     }
 
     /**

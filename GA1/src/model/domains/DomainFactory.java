@@ -1,5 +1,8 @@
 package model.domains;
 
+import model.domains.types.CircleDomain;
+import model.domains.types.RectangularDomain;
+
 import java.util.List;
 import java.util.Map;
 

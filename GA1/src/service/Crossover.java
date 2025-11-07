@@ -1,4 +1,4 @@
-package GA;
+package service;
 
 import model.Individual;
 import model.Point;

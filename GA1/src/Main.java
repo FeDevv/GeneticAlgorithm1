@@ -1,4 +1,4 @@
-import GA.EvolutionEngine;
+import controller.EvolutionEngine;
 import model.Individual;
 import model.domains.Domain;
 import model.domains.DomainFactory;
@@ -10,7 +10,7 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("--- 🧬 Configurazione Algoritmo Genetico (Dominio Circolare) ---");
+        System.out.println("--- Configurazione Algoritmo Genetico (Dominio Circolare) ---");
 
         // === 1. Raccolta Parametri Dominio ===
 
@@ -104,15 +104,12 @@ public class Main {
                 pointRadius
         );
 
-        System.out.println("Avvio evoluzione...");
-
-        Individual bestSolution = engine.reproduce();
+        Individual bestSolution = engine.runEvolutionEngine();
 
         // === 6. Output dei Risultati ===
 
-        System.out.println("\n--- Risultato Ottenuto ---");
-        System.out.printf("Generazioni completate: %d\n", generations);
+        //System.out.printf("Generazioni completate: %d\n", generations);
         System.out.printf("Fitness della soluzione migliore: %.6f\n", bestSolution.getFitness());
-        System.out.println(bestSolution.toString());
+        System.out.println(bestSolution);
     }
 }

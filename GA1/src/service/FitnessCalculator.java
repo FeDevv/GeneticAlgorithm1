@@ -1,4 +1,4 @@
-package GA;
+package service;
 
 import model.domains.Domain;
 import model.Individual;

@@ -1,13 +1,20 @@
-package GA;
+package controller;
 
+import service.Crossover;
+import service.FitnessCalculator;
+import service.Mutation;
+import service.Selection;
+import exceptions.MaxAttemptsExceededException;
 import model.Individual;
 import model.Point;
 import model.domains.Domain;
 import utils.RandomUtils;
+import view.EvolutionConsoleView;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -124,7 +131,7 @@ public class EvolutionEngine {
      * Metodo di avvio: Esegue il ciclo evolutivo completo e restituisce la migliore soluzione trovata.
      * @return Una copia della migliore soluzione trovata globalmente.
      */
-    public Individual reproduce() {
+    private Individual runEvolutionCore() {
         // tengo traccia del miglior individuo
         Individual solution;
 
@@ -196,6 +203,55 @@ public class EvolutionEngine {
 
         // Restituisce una copia profonda per garantire che il risultato finale sia immutabile per l'utente.
         return solution.copy();
+    }
+
+    public Individual runEvolutionEngine() {
+        final int MAX_RETRY_ATTEMPTS = 3;
+        int currentAttempt = 0;
+        Individual lastAttemptSolution = null;
+        double lastExecutionTimeMs = 0;
+        double totalExecutionTimeMs = 0;
+
+        EvolutionConsoleView.displayStartMessage(generations, populationSize);
+
+        do {
+            Instant startTime = Instant.now();
+
+            // aggiorna counter
+            currentAttempt++;
+
+            // 1. esecuzione del core
+            lastAttemptSolution = runEvolutionCore();
+
+            Instant endTime = Instant.now();
+            lastExecutionTimeMs = Duration.between(startTime,endTime).toMillis();
+            // se la soluzione viene trovata (e.g.) al secondo giro, devo indicare la somma dei tempi dei 2 giri come tempo di esecuzione
+            totalExecutionTimeMs += lastExecutionTimeMs;
+
+            // 2. verifica di validità
+            if (domain.isValidIndividual(lastAttemptSolution)) {
+                // mostra che una soluzione corretta è stata provata
+                EvolutionConsoleView.displaySuccess(currentAttempt, totalExecutionTimeMs / 1000);
+                return  lastAttemptSolution.copy();
+            }
+
+            // individuo non valido, mostralo all'utente
+            EvolutionConsoleView.displayRetryWarning(currentAttempt, MAX_RETRY_ATTEMPTS, lastExecutionTimeMs / 1000);
+
+        } while (currentAttempt < MAX_RETRY_ATTEMPTS);
+
+        // 4. FALLIMENTO controllato, l'algoritmo non è riuscito a trovare una soluzione.
+
+        EvolutionConsoleView.displayCriticalFailure(MAX_RETRY_ATTEMPTS, lastAttemptSolution.getFitness(), totalExecutionTimeMs / 1000);
+
+        throw new MaxAttemptsExceededException(
+                String.format(
+                "L'algoritmo genetico ha fallito dopo %d tentativi (%.2f s totali). " +
+                        "Ultima fitness: %.4f. Prova a modificare i parametri.",
+                MAX_RETRY_ATTEMPTS,
+                totalExecutionTimeMs / 1000.0,
+                lastAttemptSolution.getFitness()
+        ));
     }
 
     // ==================================================================================

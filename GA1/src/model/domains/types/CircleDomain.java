@@ -1,8 +1,13 @@
-package model.domains;
+package model.domains.types;
+
+import model.Individual;
+import model.Point;
+import model.domains.Domain;
 
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
-public class CircleDomain implements Domain{
+public class CircleDomain implements Domain {
 
     // ------------------- ATTRIBUTI -------------------
 
@@ -47,6 +52,15 @@ public class CircleDomain implements Domain{
     public boolean isPointInside(double x, double y) {
         // Equazione: x² + y² <= r²
         return (x*x + y*y) <= (radius*radius);
+    }
+
+    @Override
+    public boolean isValidIndividual(Individual individual) {
+        List<Point> points = individual.getChromosomes();
+        for (Point p : points) {
+            if (!isPointInside(p.getX(), p.getY())) { return false; }
+        }
+        return true;
     }
 
     /**
