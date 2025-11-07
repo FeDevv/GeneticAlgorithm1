@@ -9,13 +9,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomUtils {
 
-    // ------------------- ATTRIBUTI -------------------
-
-    // Generatore principale di numeri casuali.
-    // Nota: L'uso di una singola istanza 'static final' di Random è thread-safe
-    // per la maggior parte dei casi d'uso, ma introduce contesa.
-    private static final Random random = new Random();
-
     // ------------------- METODI DI UTILITÀ -------------------
 
     /**
