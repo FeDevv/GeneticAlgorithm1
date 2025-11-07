@@ -20,18 +20,18 @@ public class RandomUtils {
 
     /**
      * Genera un elenco di 'n' indici univoci compresi tra 0 (incluso) e 'maxExclusive' (escluso).
-     * Usato principalmente per la Selezione per Torneo (tournament selection).
+     *
      * @param n Il numero di indici univoci da generare (tournament size).
      * @param maxExclusive Il limite superiore del range (es. la dimensione della popolazione).
      * @return Una List<Integer> di indici univoci.
-     * * Scelta Implementativa: Usa un HashSet per garantire l'univocità con complessità O(1) per l'aggiunta.
      */
     public static List<Integer> UniqueIndices(int n, int maxExclusive) {
         Set<Integer> uniqueIndices = new HashSet<>();
+        // Usa ThreadLocalRandom per eliminare la contesa tra thread
+        ThreadLocalRandom currentRandom = ThreadLocalRandom.current();
 
-        // Continua a generare numeri casuali finché il Set non raggiunge la dimensione desiderata (n).
         while (uniqueIndices.size() < n) {
-            uniqueIndices.add(random.nextInt(maxExclusive));
+            uniqueIndices.add(currentRandom.nextInt(maxExclusive));
         }
 
         return new ArrayList<>(uniqueIndices);
@@ -43,7 +43,8 @@ public class RandomUtils {
      * Usato per decisioni binarie (es. Uniform Crossover).
      */
     public static int CoinToss() {
-        return random.nextInt(2);
+        // Usa ThreadLocalRandom
+        return ThreadLocalRandom.current().nextInt(2);
     }
 
     /**
@@ -51,7 +52,8 @@ public class RandomUtils {
      * Usato principalmente per controllare le probabilità (es. probabilità di Crossover o Mutazione).
      */
     public static double randDouble() {
-        return random.nextDouble();
+        // Usa ThreadLocalRandom
+        return ThreadLocalRandom.current().nextDouble();
     }
 
     /**

@@ -81,7 +81,7 @@ public class Main {
 
         Individual bestSolution = engine.runEvolutionEngine();
 
-        //  Output dei Risultati
+        // Output dei Risultati
 
         System.out.printf("Best solution's Fitness: %.6f\n", bestSolution.getFitness());
         System.out.println(bestSolution);
