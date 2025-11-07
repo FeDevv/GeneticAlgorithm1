@@ -3,26 +3,26 @@ package view;
 public class EvolutionConsoleView {
     // --- MESSAGGIO DI INIZIALIZZAZIONE ---
 
-    public static void displayStartMessage(int generations, int populationSize) {
-        System.out.println("🧬 Avvio Algoritmo Genetico...");
-        System.out.printf("   Configurazione: %d Generazioni | %d Individui.\n\n",
+    public void displayStartMessage(int generations, int populationSize) {
+        System.out.println("🧬 Starting Genetic Algorithm...");
+        System.out.printf("Configuration: %d Generations | %d Individuals.\n\n",
                 generations, populationSize);
-        System.out.println("Inizio Ciclo Evolutivo ...");
+        System.out.println("Executing Evolutionary Cycle ...");
     }
 
     // --- MESSAGGI DI TENTATIVO / RIPROVA ---
 
-    public static void displayRetryWarning(int currentAttempt, int maxAttempts, double lastTimeSecs) {
-        System.out.println("⚠️  AVVISO: Soluzione non valida trovata.");
-        System.out.printf("Tentativo #%d di %d\n", currentAttempt, maxAttempts);
-        System.out.printf("Tempo stimato per il prossimo tentativo: ~%.2f secondi.\n", lastTimeSecs);
+    public void displayRetryWarning(int currentAttempt, int maxAttempts, double lastTimeSecs) {
+        System.out.println("⚠️ WARNING: Invalid solution found.");
+        System.out.printf("Attempt #%d of %d\n", currentAttempt, maxAttempts);
+        System.out.printf("Estimated time for next attempt: ~%.2f seconds.\n", lastTimeSecs);
     }
 
     // --- MESSAGGI DI RISULTATO ---
 
-    public static void displaySuccess(int attempt, double timeSecs) {
-        System.out.println("\n✅ Successo! Trovata soluzione valida al tentativo #" + attempt + ".");
-        System.out.printf("Tempo di esecuzione: %.2f secondi.\n\n", timeSecs);
+    public void displaySuccess(int attempt, double timeSecs) {
+        System.out.println("\n✅ Success! Valid solution found at attempt #" + attempt + ".");
+        System.out.printf("Execution time: %.2f seconds.\n\n", timeSecs);
     }
 
     /* Teoricamente lascio la visualizzazione del risultato ad altre classi, non al controller.
@@ -35,11 +35,10 @@ public class EvolutionConsoleView {
 
     // --- MESSAGGI DI ERRORE ---
 
-    public static void displayCriticalFailure(int maxAttempts, double lastFitness, double totalTimeSecs) {
-        System.err.println("\n--- 🛑 FALLIMENTO CRITICO ---");
-        System.err.printf("Impossibile trovare una soluzione valida dopo %d cicli evolutivi completi (totale %.2f secondi di calcolo).\n",
+    public void displayCriticalFailure(int maxAttempts, double lastFitness, double totalTimeSecs) {
+        System.err.println("\n--- 🛑 CRITICAL FAILURE ---");
+        System.err.printf("Could not find a valid solution after %d complete evolutionary cycles (total %.2f seconds of computation).\n",
                 maxAttempts, totalTimeSecs);
-        System.err.printf("Fitness del miglior individuo non valido trovato: %.6f\n", lastFitness);
-        System.err.println("Suggerimento: Aumentare il numero di generazioni o allentare i vincoli.");
+        System.err.printf("Fitness of best invalid individual found: %.6f\n", lastFitness);
     }
 }

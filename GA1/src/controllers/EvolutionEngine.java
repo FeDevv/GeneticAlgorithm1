@@ -1,4 +1,4 @@
-package controller;
+package controllers;
 
 import service.Crossover;
 import service.FitnessCalculator;
@@ -9,6 +9,7 @@ import model.Individual;
 import model.Point;
 import model.domains.Domain;
 import utils.RandomUtils;
+import view.DomainConsoleView;
 import view.EvolutionConsoleView;
 
 import java.time.Duration;
@@ -63,6 +64,7 @@ public class EvolutionEngine {
     private final Mutation gammaRays;
     private final Crossover mixer;
     private final Selection selector;
+    private final EvolutionConsoleView view;
 
     // ==================================================================================
     // 🔨 COSTRUTTORE
@@ -71,9 +73,10 @@ public class EvolutionEngine {
     /**
      * Costruttore completo per configurare tutti i parametri dell'algoritmo genetico.
      */
-    public EvolutionEngine(Domain domain, int populationSize, int individualSize, int generations, int tournamentSize, double elitesPercentage,
+    public EvolutionEngine(EvolutionConsoleView view, Domain domain, int populationSize, int individualSize, int generations, int tournamentSize, double elitesPercentage,
                            double crossoverProbability, double mutationProbability, double initialMutationStrenght, double radius) {
         // Inizializza tutti gli attributi finali di configurazione.
+        this.view = view;
         this.domain = domain;
         this.populationSize = populationSize;
         this.individualSize = individualSize;
@@ -212,7 +215,7 @@ public class EvolutionEngine {
         double lastExecutionTimeMs = 0;
         double totalExecutionTimeMs = 0;
 
-        EvolutionConsoleView.displayStartMessage(generations, populationSize);
+        view.displayStartMessage(generations, populationSize);
 
         do {
             Instant startTime = Instant.now();
@@ -231,18 +234,18 @@ public class EvolutionEngine {
             // 2. verifica di validità
             if (domain.isValidIndividual(lastAttemptSolution)) {
                 // mostra che una soluzione corretta è stata provata
-                EvolutionConsoleView.displaySuccess(currentAttempt, totalExecutionTimeMs / 1000);
+                view.displaySuccess(currentAttempt, totalExecutionTimeMs / 1000);
                 return  lastAttemptSolution.copy();
             }
 
             // individuo non valido, mostralo all'utente
-            EvolutionConsoleView.displayRetryWarning(currentAttempt, MAX_RETRY_ATTEMPTS, lastExecutionTimeMs / 1000);
+            view.displayRetryWarning(currentAttempt, MAX_RETRY_ATTEMPTS, lastExecutionTimeMs / 1000);
 
         } while (currentAttempt < MAX_RETRY_ATTEMPTS);
 
         // 4. FALLIMENTO controllato, l'algoritmo non è riuscito a trovare una soluzione.
 
-        EvolutionConsoleView.displayCriticalFailure(MAX_RETRY_ATTEMPTS, lastAttemptSolution.getFitness(), totalExecutionTimeMs / 1000);
+        view.displayCriticalFailure(MAX_RETRY_ATTEMPTS, lastAttemptSolution.getFitness(), totalExecutionTimeMs / 1000);
 
         throw new MaxAttemptsExceededException(
                 String.format(
