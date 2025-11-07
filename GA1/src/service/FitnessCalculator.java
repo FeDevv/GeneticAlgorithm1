@@ -48,7 +48,7 @@ public class FitnessCalculator {
         // --- PENALITÀ DI DOMINIO (Complessità O(N)) ---
         // Controlla il vincolo di confine per ogni singolo punto (gene).
         for (Point p : chromosomes) {
-            if (!this.currentDomain.isPointInside(p.getX(), p.getY())) {
+            if (this.currentDomain.isPointOutside(p.getX(), p.getY())) {
                 totalPenalty += DOMAIN_PENALTY;
             }
         }

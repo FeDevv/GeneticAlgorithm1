@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 
 public interface Domain {
     //controlla se un punto è all'interno del dominio
-    boolean isPointInside(double x, double y);
+    boolean isPointOutside(double x, double y);
 
     //controlla se un individuo è valido (tutti i suoi punti sono nel dominio)
     boolean isValidIndividual(Individual individual);

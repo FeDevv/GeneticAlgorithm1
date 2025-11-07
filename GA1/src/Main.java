@@ -28,7 +28,7 @@ public class Main {
         if (domainOptional.isPresent()) {
             problemDomain = domainOptional.get();
         } else {
-            System.out.println("Creazione del dominio annullata o fallita.");
+            System.out.println("Domain creation canceled or failed.");
             return;
         }
 
@@ -44,7 +44,7 @@ public class Main {
             }
         }
 
-        //Tutta questa parte poi andrà nel controller totale. Per ora la metto qua.
+        //Tutta questa parte poi andrà nel controller finale. Per ora la metto qua.
         Rectangle2D boundingBox = problemDomain.getBoundingBox();
         double boxWidth = boundingBox.getWidth();
         double boxHeight = boundingBox.getHeight();

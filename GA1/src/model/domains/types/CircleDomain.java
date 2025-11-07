@@ -49,16 +49,17 @@ public class CircleDomain implements Domain {
      * Non calcolare la radice quadrata (Math.hypot o Math.sqrt) rende il controllo più veloce.
      */
     @Override
-    public boolean isPointInside(double x, double y) {
+    public boolean isPointOutside(double x, double y) {
         // Equazione: x² + y² <= r²
-        return (x*x + y*y) <= (radius*radius);
+        // sto facendo !(isPointInside)
+        return !((x * x + y * y) <= (radius * radius));
     }
 
     @Override
     public boolean isValidIndividual(Individual individual) {
         List<Point> points = individual.getChromosomes();
         for (Point p : points) {
-            if (!isPointInside(p.getX(), p.getY())) { return false; }
+            if (isPointOutside(p.getX(), p.getY())) { return false; }
         }
         return true;
     }

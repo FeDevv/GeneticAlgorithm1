@@ -46,16 +46,17 @@ public class RectangularDomain implements Domain {
      * @return True se il punto è compreso tra i limiti [-width/2, width/2] e [-height/2, height/2].
      */
     @Override
-    public boolean isPointInside(double x, double y) {
-        return x >= -width / 2 && x <= width / 2 &&
-                y >= -height / 2 && y <= height / 2;
+    public boolean isPointOutside(double x, double y) {
+        // sto facendo !(isPointInside)
+        return !((x >= -width / 2) && (x <= width / 2) &&
+                (y >= -height / 2) && (y <= height / 2));
     }
 
     @Override
     public boolean isValidIndividual(Individual individual) {
         List<Point> points = individual.getChromosomes();
         for (Point p : points) {
-            if (!isPointInside(p.getX(), p.getY())) { return false; }
+            if (isPointOutside(p.getX(), p.getY())) { return false; }
         }
         return true;
     }

@@ -252,8 +252,8 @@ public class EvolutionEngine {
 
         throw new MaxAttemptsExceededException(
                 String.format(
-                "L'algoritmo genetico ha fallito dopo %d tentativi (%.2f s totali). " +
-                        "Ultima fitness: %.4f. Prova a modificare i parametri.",
+                "The genetic algorithm failed after %d attempts (%.2f total seconds). " +
+                        "Last Fitness value: %.4f. Try changing the parameters.",
                 MAX_RETRY_ATTEMPTS,
                 totalExecutionTimeMs / 1000.0,
                 lastAttemptSolution.getFitness()

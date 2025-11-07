@@ -49,7 +49,7 @@ public class RandomUtils {
 
     /**
      * Genera un numero double casuale tra [0.0 (incluso) e 1.0 (escluso)).
-     * Usato principalmente per controllare le probabilità (es. probabilità di Crossover o Mutazione).
+     * Usato principalmente per controllare le probabilità (es. Probabilità di Crossover o Mutazione).
      */
     public static double randDouble() {
         // Usa ThreadLocalRandom
