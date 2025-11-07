@@ -9,7 +9,6 @@ import model.Individual;
 import model.Point;
 import model.domains.Domain;
 import utils.RandomUtils;
-import view.DomainConsoleView;
 import view.EvolutionConsoleView;
 
 import java.time.Duration;
@@ -19,51 +18,57 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- * Questo è il controller dell'evoluzione, esegue in maniera ordinata
- * tutti i passaggi necessari per creare una nuova generazione e selezionare il miglior risultato.
- * I passaggi da eseguire sono:
+ * Motore centrale che gestisce il ciclo evolutivo di un Algoritmo Genetico (AG).
  * <p>
- * 1. crea una lista vuota per mantenere una nuova popolazione
- * 2. dal precedente miglior risultato, prendi gli ELITEs, ossia i migliori e ricopiali (clona) direttamente nella nuova popolazione
- * 3. per il resto degli individui effettua il seguente ciclo tante volte quanti sono i posti liberi :
- *  3.1 attraverso un torneo, cerca la mamma
- *  3.2 attraverso un torneo, cerca il papà
- *  3.3 effettua crossover (con probabilità) tra mamma e papà -> genera 1 solo figlio
- *  3.4 effettua mutazione (con probabilità) sul figlio
- *  3.5 aggiungi il figlio alla popolazione
- * 4. Ritorna la nuova popolazione
- * </p>
- * I punti 1. e 2. implicano che ci deve essere una popolazione precedente, dobbiamo occuparci del passo base.
- * Questa classe si occuperà anche di generare randomimcamente la prima generazione.
- * */
+ * Questa classe incapsula tutte le costanti di configurazione dell'AG (dimensioni, probabilità, ecc.)
+ * e orchestra l'esecuzione dei servizi (Fitness, Mutazione, Crossover, Selezione) per risolvere
+ * un problema di ottimizzazione vincolato a un {@code Domain} geometrico.
+ */
 public class EvolutionEngine {
 
     // ==================================================================================
     // ⚙️ CONFIGURAZIONE E ATTRIBUTI IMMUTABILI
     // ==================================================================================
 
-    // Il vincolo spaziale del problema.
+// Configurazione dei Parametri AG, fissi per l'esecuzione.
+    //Numero massimo di generazioni da eseguire.
+    private final int GENERATIONS = 800;
+    // Dimensione fissa di ogni popolazione in ogni generazione.
+    private final int POPULATION_SIZE = 100;
+    // Numero di individui selezionati per il torneo durante la selezione.
+    private final int TOURNAMENT_SIZE = 3;
+    // Percentuale della popolazione (gli individui migliori) da preservare tramite elitismo.
+    private final double ELITES_PERCENTAGE = 0.05;
+    // Probabilità di eseguire l'operatore di Crossover su una coppia di genitori.
+    private final double CROSSOVER_PROB = 0.9;
+    // Forza iniziale dell'operatore di Mutazione (utilizzata, ad esempio, per ricottura simulata o riduzione progressiva).
+    private final double INITIAL_MUTATION_STRENGTH = 1.0;
+    // Probabilità di eseguire l'operatore di Mutazione su un gene (Point) di un nuovo individuo.
+    private final double MUTATION_PROB = 0.02;
+
+    // Attributi di contesto e vincolo, forniti dall'esterno.
+
+    // Il vincolo spaziale del problema. Definisce l'area valida per i punti degli individui.
     private final Domain domain;
 
-    // Numero di soluzioni candidate in ogni generazione.
-    private final int populationSize;
-
-    // Lunghezza del cromosoma: numero di Point per individuo.
+    /** Lunghezza del cromosoma: numero di {@code Point} (geni) che compongono ciascun individuo. */
     private final int individualSize;
 
-    // Numero massimo di iterazioni (cicli) evolutivi.
-    private final int generations;
-
-    // Il raggio (dimensione) dei punti che compongono gli individui.
-    private final double radius;
+    /** Il raggio (dimensione) dei {@code Point} che compongono gli individui, rilevante per la validazione spaziale. */
+    private final double pointRadius;
 
     // ------------------- SERVIZI E STATO -------------------
 
-    // services
+    // Servizi (Dipendenze): componenti funzionali dell'AG.
+    // Servizio per il calcolo del valore di fitness di un individuo.
     private final FitnessCalculator fitnessCalculator;
+    // Servizio per l'applicazione dell'operatore di Mutazione.
     private final Mutation gammaRays;
+    // Servizio per l'applicazione dell'operatore di Crossover.
     private final Crossover mixer;
+    // Servizio per l'applicazione dell'operatore di Selezione.
     private final Selection selector;
+    // Componente View per la gestione dell'output e della visualizzazione dello stato evolutivo.
     private final EvolutionConsoleView view;
 
     // ==================================================================================
@@ -71,31 +76,29 @@ public class EvolutionEngine {
     // ==================================================================================
 
     /**
-     * Costruttore completo per configurare tutti i parametri dell'algoritmo genetico.
+     * Costruttore completo che inizializza il motore evolutivo e tutti i suoi servizi.
+     * <p>
+     * Le dipendenze essenziali (View e contesto spaziale) sono iniettate, mentre i servizi
+     * funzionali vengono istanziati internamente utilizzando le costanti AG definite nella classe.
+     *
+     * @param view La View da utilizzare per l'interazione e la visualizzazione dello stato.
+     * @param domain Il vincolo spaziale che definisce l'area valida per la soluzione.
+     * @param individualSize La lunghezza (numero di punti) del cromosoma degli individui.
+     * @param pointRadius La dimensione dei punti che compongono l'individuo.
      */
-    public EvolutionEngine(EvolutionConsoleView view, Domain domain, int populationSize, int individualSize, int generations, int tournamentSize, double elitesPercentage,
-                           double crossoverProbability, double mutationProbability, double initialMutationStrenght, double radius) {
+    public EvolutionEngine(EvolutionConsoleView view, Domain domain, int individualSize, double pointRadius) {
         // Inizializza tutti gli attributi finali di configurazione.
         this.view = view;
         this.domain = domain;
-        this.populationSize = populationSize;
         this.individualSize = individualSize;
-        this.generations = generations;
-        this.radius = radius;
-        // tournamentSize --> Dimensione N per la selezione per torneo.
-        // elitesPercentage --> Percentuale della popolazione da copiare direttamente (strategia di elitismo).
-        // crossoverProbability --> Probabilità di ricombinazione.
-        // mutationStrenght --> L'ampiezza massima della perturbazione della mutazione.
-        // mutationProbability --> Probabilità che un singolo gene muti.
+        this.pointRadius = pointRadius;
 
-        // Non serve memorizzare questi parametri che ho commentato, in quanto servono solo all'inizializzazione del controller
-        // verranno salvati nelle classi di servizio corrispondenti.
-
-        // Inizializzazione dei servizi, sono costanti per tutta l'esecuzione. Unica istanza.
+        // Inizializzazione dei servizi: sono istanze costanti (Singleton) per tutta l'esecuzione.
+        // I servizi sono configurati con i parametri AG e le dipendenze necessarie.
         this.fitnessCalculator = new FitnessCalculator(domain);
-        this.gammaRays = new Mutation(mutationProbability, initialMutationStrenght, domain, generations);
-        this.mixer = new Crossover(crossoverProbability);
-        this.selector = new Selection(tournamentSize, elitesPercentage);
+        this.gammaRays = new Mutation(MUTATION_PROB, INITIAL_MUTATION_STRENGTH, domain, GENERATIONS);
+        this.mixer = new Crossover(CROSSOVER_PROB);
+        this.selector = new Selection(TOURNAMENT_SIZE, ELITES_PERCENTAGE);
     }
 
     // ==================================================================================
@@ -109,8 +112,8 @@ public class EvolutionEngine {
     private Individual buildIndividual() {
         List<Point> points = new ArrayList<>(individualSize);
         for (int i = 0; i < individualSize; i++) {
-            // Usa il raggio del punto (this.radius) per creare il Point.
-            points.add(RandomUtils.insideBoxGenerator(domain.getBoundingBox(), radius));
+            // Usa il raggio del punto (this.pointRadius) per creare il Point.
+            points.add(RandomUtils.insideBoxGenerator(domain.getBoundingBox(), pointRadius));
         }
         return new Individual(points);
     }
@@ -119,8 +122,8 @@ public class EvolutionEngine {
      * Crea la prima generazione di individui (popolazione iniziale) in modo casuale.
      */
     private List<Individual> firstGeneration() {
-        List<Individual> firstGen = new ArrayList<>(populationSize);
-        for (int i = 0; i < populationSize; i++) {
+        List<Individual> firstGen = new ArrayList<>(POPULATION_SIZE);
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             firstGen.add(buildIndividual());
         }
         return firstGen;
@@ -153,17 +156,17 @@ public class EvolutionEngine {
         solution = currentBestSolution(oldGeneration, null);
 
         // --- Fase 2: Ciclo di Evoluzione ---
-        for (int i = 0; i < generations; i++) {
+        for (int i = 0; i < GENERATIONS; i++) {
 
             final List<Individual> currentGeneration = oldGeneration;
-            List<Individual> newGeneration = new ArrayList<>(populationSize);
+            List<Individual> newGeneration = new ArrayList<>(POPULATION_SIZE);
 
             // 1. Elitismo: seleziona i migliori della generazione precedente.
             List<Individual> elites = selector.selectElites(oldGeneration);
             newGeneration.addAll(elites);
 
             // 2. Crossover e Mutazione: riempie il resto della popolazione.
-            int childrenToGenerate = populationSize - elites.size();
+            int childrenToGenerate = POPULATION_SIZE - elites.size();
 
             // Genera i figli in parallelo e raccoglili in una lista temporanea
             final int currentGenerationAge = i;
@@ -211,11 +214,11 @@ public class EvolutionEngine {
     public Individual runEvolutionEngine() {
         final int MAX_RETRY_ATTEMPTS = 3;
         int currentAttempt = 0;
-        Individual lastAttemptSolution = null;
-        double lastExecutionTimeMs = 0;
+        Individual lastAttemptSolution;
+        double lastExecutionTimeMs;
         double totalExecutionTimeMs = 0;
 
-        view.displayStartMessage(generations, populationSize);
+        view.displayStartMessage(GENERATIONS, POPULATION_SIZE);
 
         do {
             Instant startTime = Instant.now();

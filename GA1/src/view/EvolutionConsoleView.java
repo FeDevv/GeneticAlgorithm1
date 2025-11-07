@@ -4,7 +4,7 @@ public class EvolutionConsoleView {
     // --- MESSAGGIO DI INIZIALIZZAZIONE ---
 
     public void displayStartMessage(int generations, int populationSize) {
-        System.out.println("🧬 Starting Genetic Algorithm...");
+        System.out.println("\n🧬 Starting Genetic Algorithm...");
         System.out.printf("Configuration: %d Generations | %d Individuals.\n\n",
                 generations, populationSize);
         System.out.println("Executing Evolutionary Cycle ...");

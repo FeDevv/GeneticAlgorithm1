@@ -1,8 +1,5 @@
 package model;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class Point {
     // ------------------- ATTRIBUTI (Stato del Gene) -------------------
 
@@ -61,10 +58,13 @@ public class Point {
     public double getRadius() { return radius; }
 
     /** Ritorna la coppia di coordinate come lista (utile per API o interfacce generiche). */
+    /*
     public List<Double> getCoordinates() {
         // Uso di Arrays.asList(x, y) per creare una lista immutabile al volo.
         return Arrays.asList(getX(), getY());
     }
+    */
+
 
     // ------------------- UTILITY -------------------
 

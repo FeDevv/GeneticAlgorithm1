@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -101,7 +100,7 @@ public class Individual {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Individuo : ").append("\n");
+        sb.append("Individual : ").append("\n");
         for (Point p : chromosomes) {
             sb.append(p.toString()).append("\n");
         }

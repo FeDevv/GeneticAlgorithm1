@@ -53,9 +53,7 @@ public class DomainController {
                 return Optional.empty(); // Uscita richiesta dall'utente
 
             // 3. Mappatura della scelta all'Enum
-            Optional<DomainType> selectedType = Arrays.stream(DomainType.values())
-                    .filter(t -> t.getMenuId() == choice)
-                    .findFirst();
+            Optional<DomainType> selectedType = DomainType.fromMenuId(choice);
 
             if (selectedType.isEmpty()) {
                 // Scelta numerica non valida (non mappata a nessun DomainType)

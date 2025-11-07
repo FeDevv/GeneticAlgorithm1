@@ -47,9 +47,12 @@ public class DomainFactory {
             case RECTANGLE ->
                     // L'esistenza delle chiavi "larghezza" e "altezza" è garantita dalla validazione.
                     new RectangularDomain(params.get("width"), params.get("height"));
+            /*
             default ->
                 // Meccanismo di sicurezza: Cattura eventuali nuovi tipi non ancora gestiti nel factory.
                     throw new IllegalArgumentException("Domain type not supported " + type);
+
+            */
         };
 
     }
