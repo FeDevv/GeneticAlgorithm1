@@ -71,6 +71,9 @@ public class Main {
 
         scanner.close(); // Chiude lo scanner dopo aver finito di leggere l'input
 
+        // l'evolution engine riceve delle coppie: [(numero punti, raggio punti), (numero punti, raggio punti)]
+        // il totale dei punti sarà la dimensione dell'individuo, nei controlli, ogni punto avrà il suo raggio.
+
         // Creazione e Avvio del Motore
         EvolutionEngine engine = new EvolutionEngine(
                 new EvolutionConsoleView(),

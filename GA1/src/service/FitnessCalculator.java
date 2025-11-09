@@ -3,102 +3,93 @@ package service;
 import model.domains.Domain;
 import model.Individual;
 import model.Point;
+import service.strategies.OverlapQuadratic;
+import service.strategies.OverlapSpatial;
+import service.strategies.OverlapStrategy;
+import utils.DistanceCalculator;
 
 import java.util.List;
 
+import java.util.*;
+
 public class FitnessCalculator {
 
-    // ------------------- ATTRIBUTI (Pesi di Penalizzazione) -------------------
+    // ------------------- COSTANTI DI PENALIZZAZIONE -------------------
 
-    private final Domain currentDomain;
-
-    // Penalità fissa molto alta per ogni gene (Point) che viola i confini del dominio.
-    // Garantisce che le soluzioni fuori dal dominio abbiano una fitness quasi zero.
+    // Penalità molto alta applicata per ogni violazione del confine del dominio.
+    // Assicura che la soluzione venga scartata se i punti sono fuori dal dominio.
     private static final double DOMAIN_PENALTY = 10000.0;
 
-    // Peso applicato alla quantità di sovrapposizione tra i punti.
-    // Un valore alto assicura che l'overlap sia l'obiettivo primario da minimizzare.
+    // Peso moltiplicativo applicato alla penalità di sovrapposizione.
+    // L'uso di un peso alto spinge l'AG a risolvere prima le collisioni.
     private static final double OVERLAP_WEIGHT = 100.0;
 
-    // NOTA: Per il futuro, qui potremmo aggiungere DISTANCE_WEIGHT per l'obiettivo di distribuzione.
+    // Soglia critica per la commutazione di strategia.
+    // Sotto questo numero di punti (N), il metodo O(N^2) è più veloce dell'O(N) a causa dell'overhead di setup.
+    private static final int HASHING_THRESHOLD = 80;
+
+    // ------------------- ATTRIBUTI -------------------
+
+    // Riferimento al dominio geometrico (il vincolo di confine).
+    private final Domain currentDomain;
+    private final DistanceCalculator distanceCalculator;
+
+    // Strategie di overlap (istanziamo una volta sola, risparmiando risorse)
+    private final OverlapStrategy quadraticStrategy;
+    private final OverlapStrategy spatialStrategy;
 
     // ------------------- COSTRUTTORE -------------------
-
     /**
-     * Costruisce il calcolatore di fitness associandolo al dominio specifico del problema.
-     * @param domain Il dominio geometrico che definisce i vincoli di confine.
-     * * Scelta Implementativa: L'uso di 'final' garantisce che la configurazione del dominio non cambi.
+     * Inizializza il calcolatore di fitness.
+     * @param domain Il dominio geometrico.
+     * @param maxRadius Il raggio massimo assoluto tra tutti i punti (costante per il problema).
      */
-    public FitnessCalculator(Domain domain) {
+    public FitnessCalculator(Domain domain, double maxRadius) {
         this.currentDomain = domain;
+        this.distanceCalculator = new DistanceCalculator(); // Helper per la distanza
+
+        // Inizializzazione delle due strategie O(N^2) e O(N).
+        // Passiamo maxRadius solo alla strategia spaziale che ne ha bisogno.
+        this.quadraticStrategy = new OverlapQuadratic();
+        this.spatialStrategy = new OverlapSpatial(maxRadius);
     }
 
     // ------------------- METODO PRINCIPALE -------------------
-
     /**
-     * Calcola il valore di fitness per un dato individuo.
-     * La fitness è una misura della qualità, dove un valore più alto è migliore.
-     * @param individual L'individuo (soluzione candidata) da valutare.
-     * @return Il valore di fitness, compreso tra 0 e 1 (se totalPenalty >= 0).
+     * Calcola il valore di fitness per un dato individuo. La strategia è ibrida.
+     * @param individual L'individuo da valutare.
+     * @return Il valore di fitness (valore più alto è migliore, max 1.0).
      */
     public double getFitness(Individual individual) {
         List<Point> chromosomes = individual.getChromosomes();
+        int n = chromosomes.size();
         double totalPenalty = 0.0;
 
-        // --- PENALITÀ DI DOMINIO (Complessità O(N)) ---
-        // Controlla il vincolo di confine per ogni singolo punto (gene).
+        // 1️⃣ Penalità di dominio (Complessità O(N))
+        // Controlla che ogni punto sia confinato all'interno del dominio.
         for (Point p : chromosomes) {
-            if (this.currentDomain.isPointOutside(p.getX(), p.getY())) {
+            if (currentDomain.isPointOutside(p.getX(), p.getY())) {
                 totalPenalty += DOMAIN_PENALTY;
             }
         }
 
-        // --- PENALITÀ DI OVERLAP (Complessità O(N^2)) ---
-        // Controlla il vincolo di non-sovrapposizione per ogni coppia di punti.
-        for (int i = 0; i < chromosomes.size(); i++) {
-            Point p_i = chromosomes.get(i);
-            double r_i = p_i.getRadius();
-
-            // Il ciclo interno parte da i+1 per evitare di confrontare un punto con sé stesso e contare le coppie due volte.
-            for (int j = i+1; j < chromosomes.size(); j++) {
-                Point p_j = chromosomes.get(j);
-                double r_j = p_j.getRadius();
-
-                double requiredDistance = r_i + r_j;
-                double actualDistance = getDistance(p_i, p_j);
-
-                // Se la distanza attuale è minore della distanza richiesta, c'è sovrapposizione.
-                if (actualDistance < requiredDistance) {
-                    double overlapAmount = requiredDistance - actualDistance;
-                    // * Scelta Implementativa: Penalità Quadratica.
-                    // L'uso di (overlapAmount * overlapAmount) penalizza le sovrapposizioni maggiori in modo esponenziale,
-                    // spingendo l'AG a risolverle rapidamente.
-                    totalPenalty += (overlapAmount * overlapAmount) * OVERLAP_WEIGHT;
-                }
-            }
+        // 2️⃣ Penalità di overlap: Logica di commutazione Ibrida
+        if (n <= HASHING_THRESHOLD) {
+            // Per N piccoli, l'overhead della struttura dati O(N) non ripaga.
+            totalPenalty += quadraticStrategy.calculateOverlap(
+                    chromosomes, OVERLAP_WEIGHT, distanceCalculator
+            );
+        } else {
+            // Per N grandi, l'efficienza O(N) medio è necessaria.
+            totalPenalty += spatialStrategy.calculateOverlap(
+                    chromosomes, OVERLAP_WEIGHT, distanceCalculator
+            );
         }
 
-        // --- CONVERSIONE FINALE (Minimizzazione -> Massimizzazione) ---
-        // Funzione di conversione: F = 1 / (1 + C).
-        // Una penalità totale (C) di 0 restituisce la fitness massima (1.0).
-        // Una penalità alta restituisce una fitness che tende a 0.
+        // 3️⃣ Conversione finale (Minimizzazione della Penalità -> Massimizzazione della Fitness)
+        // Formula standard: F = 1 / (1 + Penalità Totale).
         return 1.0 / (1.0 + totalPenalty);
     }
 
-    // ------------------- UTILITY -------------------
-
-    /**
-     * Calcola la distanza euclidea tra i centri di due punti.
-     * @param p1 Centro del primo punto.
-     * @param p2 Centro del secondo punto.
-     * @return La distanza tra i centri.
-     * * Scelta Implementativa: Uso di Math.hypot.
-     * Math.hypot è più robusto di Math.sqrt(dx*dx + dy*dy) per prevenire potenziali overflow
-     * con coordinate molto grandi.
-     */
-    public double getDistance(Point p1, Point p2) {
-        double dx = p2.getX() - p1.getX();
-        double dy = p2.getY() - p1.getY();
-        return Math.hypot(dx, dy);
-    }
 }
+

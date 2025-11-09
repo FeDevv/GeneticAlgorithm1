@@ -54,7 +54,9 @@ public class EvolutionEngine {
     /** Lunghezza del cromosoma: numero di {@code Point} (geni) che compongono ciascun individuo. */
     private final int individualSize;
 
-    /** Il raggio (dimensione) dei {@code Point} che compongono gli individui, rilevante per la validazione spaziale. */
+    /** Il raggio (dimensione) dei {@code Point} che compongono gli individui, rilevante per la validazione spaziale.
+     * indicherà poi il più grande raggio dei punti (se ho diversi raggi disponibili, quel valore sarà il raggio più grande)
+     * */
     private final double pointRadius;
 
     // ------------------- SERVIZI E STATO -------------------
@@ -95,7 +97,7 @@ public class EvolutionEngine {
 
         // Inizializzazione dei servizi: sono istanze costanti (Singleton) per tutta l'esecuzione.
         // I servizi sono configurati con i parametri AG e le dipendenze necessarie.
-        this.fitnessCalculator = new FitnessCalculator(domain);
+        this.fitnessCalculator = new FitnessCalculator(domain, pointRadius);
         this.gammaRays = new Mutation(MUTATION_PROB, INITIAL_MUTATION_STRENGTH, domain, GENERATIONS);
         this.mixer = new Crossover(CROSSOVER_PROB);
         this.selector = new Selection(TOURNAMENT_SIZE, ELITES_PERCENTAGE);
