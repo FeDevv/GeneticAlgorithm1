@@ -2,6 +2,7 @@ package service.strategies;
 
 import model.Point;
 import utils.DistanceCalculator;
+import utils.PenaltyHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,7 +78,6 @@ public class OverlapSpatial implements OverlapStrategy{
         for (Point p_i : chromosomes) {
             int iCell = getCellIndex(p_i.getX());
             int jCell = getCellIndex(p_i.getY());
-            double r_i = p_i.getRadius();
 
             // Ciclo 3x3: Itera attraverso gli offset [-1, 0, 1] per gli indici i e j.
             for (int di = -1; di <= 1; di++) {
@@ -97,16 +97,8 @@ public class OverlapSpatial implements OverlapStrategy{
                         // sia deterministico e che ogni coppia venga processata una sola volta.
                         if (System.identityHashCode(p_i) > System.identityHashCode(p_j)) continue;
 
-                        double r_j = p_j.getRadius();
-                        double requiredDistance = r_i + r_j;
-                        double actualDistance = distanceCalculator.getDistance(p_i, p_j);
+                        penalty += PenaltyHelper.calculatePairPenalty(p_i, p_j, overlapWeight, distanceCalculator);
 
-                        // Se la distanza attuale è minore della distanza richiesta, c'è sovrapposizione.
-                        if (actualDistance < requiredDistance) {
-                            double overlap = requiredDistance - actualDistance;
-                            // Penalità Quadratica: (overlap * overlap) * peso
-                            penalty += (overlap * overlap) * overlapWeight;
-                        }
                     }
                 }
             }

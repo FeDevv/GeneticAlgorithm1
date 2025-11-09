@@ -33,20 +33,24 @@ public class EvolutionEngine {
 // Configurazione dei Parametri AG, fissi per l'esecuzione.
     //Numero massimo di generazioni da eseguire.
     private final int GENERATIONS = 800;
+
     // Dimensione fissa di ogni popolazione in ogni generazione.
     private final int POPULATION_SIZE = 100;
+
     // Numero di individui selezionati per il torneo durante la selezione.
     private final int TOURNAMENT_SIZE = 3;
+
     // Percentuale della popolazione (gli individui migliori) da preservare tramite elitismo.
     private final double ELITES_PERCENTAGE = 0.05;
+
     // Probabilità di eseguire l'operatore di Crossover su una coppia di genitori.
     private final double CROSSOVER_PROB = 0.9;
+
     // Forza iniziale dell'operatore di Mutazione (utilizzata, ad esempio, per ricottura simulata o riduzione progressiva).
     private final double INITIAL_MUTATION_STRENGTH = 1.0;
+
     // Probabilità di eseguire l'operatore di Mutazione su un gene (Point) di un nuovo individuo.
     private final double MUTATION_PROB = 0.02;
-
-    // Attributi di contesto e vincolo, forniti dall'esterno.
 
     // Il vincolo spaziale del problema. Definisce l'area valida per i punti degli individui.
     private final Domain domain;
@@ -55,21 +59,26 @@ public class EvolutionEngine {
     private final int individualSize;
 
     /** Il raggio (dimensione) dei {@code Point} che compongono gli individui, rilevante per la validazione spaziale.
-     * indicherà poi il più grande raggio dei punti (se ho diversi raggi disponibili, quel valore sarà il raggio più grande)
+     * Indicherà poi il più grande raggio dei punti (se ho diversi raggi disponibili, quel valore sarà il raggio più grande)
      * */
     private final double pointRadius;
 
     // ------------------- SERVIZI E STATO -------------------
 
     // Servizi (Dipendenze): componenti funzionali dell'AG.
+
     // Servizio per il calcolo del valore di fitness di un individuo.
     private final FitnessCalculator fitnessCalculator;
+
     // Servizio per l'applicazione dell'operatore di Mutazione.
     private final Mutation gammaRays;
+
     // Servizio per l'applicazione dell'operatore di Crossover.
     private final Crossover mixer;
+
     // Servizio per l'applicazione dell'operatore di Selezione.
     private final Selection selector;
+
     // Componente View per la gestione dell'output e della visualizzazione dello stato evolutivo.
     private final EvolutionConsoleView view;
 

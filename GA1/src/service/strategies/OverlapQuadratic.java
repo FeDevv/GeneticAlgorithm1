@@ -2,6 +2,7 @@ package service.strategies;
 
 import model.Point;
 import utils.DistanceCalculator;
+import utils.PenaltyHelper;
 
 import java.util.List;
 
@@ -34,7 +35,6 @@ public class OverlapQuadratic implements OverlapStrategy{
         // Ciclo esterno: Seleziona il punto di riferimento p_i. Complessità O(N).
         for (int i = 0; i < n; i++) {
             Point p_i = chromosomes.get(i);
-            double r_i = p_i.getRadius();
 
             // Ciclo interno: Confronta p_i con tutti i punti successivi p_j. Complessità O(N).
             // L'indice j = i + 1 è cruciale per due motivi:
@@ -44,22 +44,8 @@ public class OverlapQuadratic implements OverlapStrategy{
             for (int j = i + 1; j < n; j++) {
                 Point p_j = chromosomes.get(j);
 
-                double r_j = p_j.getRadius();
-                // Distanza minima richiesta per l'assenza di overlap.
-                double requiredDistance = r_i + r_j;
-                // Distanza effettiva tra i centri.
-                double actualDistance = distanceCalculator.getDistance(p_i, p_j);
+                penalty += PenaltyHelper.calculatePairPenalty(p_i, p_j, overlapWeight, distanceCalculator);
 
-                // Condizione di sovrapposizione: la distanza tra i centri è inferiore alla somma dei raggi.
-                if (actualDistance < requiredDistance) {
-                    // Calcola l'entità dell'overlap: quanta distanza è "mancante".
-                    double overlap = requiredDistance - actualDistance;
-
-                    // Applicazione della Penalità Quadratica:
-                    // (overlap * overlap) penalizza gli errori più grandi in modo esponenziale.
-                    // Moltiplicato per il peso per configurare l'importanza del vincolo.
-                    penalty += (overlap * overlap) * overlapWeight;
-                }
             }
         }
         return penalty;

@@ -10,7 +10,7 @@ public class Point {
     // Il raggio (dimensione) dell'oggetto.
     private final double radius;
 
-    /**
+    /*
      * Scelta Implementativa: Uso di 'final' per tutti i campi.
      * Questo rende la classe Point **totalmente immutabile**.
      * * Beneficio: Quando un individuo è sottoposto a Mutazione o Crossover,
@@ -56,15 +56,6 @@ public class Point {
 
     /** Ritorna il raggio dell'oggetto. */
     public double getRadius() { return radius; }
-
-    /** Ritorna la coppia di coordinate come lista (utile per API o interfacce generiche). */
-    /*
-    public List<Double> getCoordinates() {
-        // Uso di Arrays.asList(x, y) per creare una lista immutabile al volo.
-        return Arrays.asList(getX(), getY());
-    }
-    */
-
 
     // ------------------- UTILITY -------------------
 
