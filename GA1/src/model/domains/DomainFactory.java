@@ -1,7 +1,8 @@
 package model.domains;
 
 import model.domains.types.CircleDomain;
-import model.domains.types.RectangularDomain;
+import model.domains.types.RectangleDomain;
+import model.domains.types.SquareDomain;
 
 import java.util.List;
 import java.util.Map;
@@ -41,12 +42,14 @@ public class DomainFactory {
         // Cuore del factory. L'uso dello switch expression è pulito e type-safe.
         return switch (type) {
             case CIRCLE ->
-                    // L'esistenza della chiave "raggio" è garantita dal metodo validateParameters.
-                    // Si assume che la validazione del valore (raggio > 0) sia gestita all'interno del costruttore di CircleDomain.
-                    new CircleDomain(params.get("radius"));
+                // L'esistenza della chiave "raggio" è garantita dal metodo validateParameters.
+                // La validazione del valore (raggio > 0) è gestita all'interno del costruttore di CircleDomain.
+                new CircleDomain(params.get("radius"));
             case RECTANGLE ->
-                    // L'esistenza delle chiavi "larghezza" e "altezza" è garantita dalla validazione.
-                    new RectangularDomain(params.get("width"), params.get("height"));
+                // L'esistenza delle chiavi "larghezza" e "altezza" è garantita dalla validazione.
+                new RectangleDomain(params.get("width"), params.get("height"));
+            case SQUARE ->
+                new SquareDomain(params.get("side"));
             /*
             default ->
                 // Meccanismo di sicurezza: Cattura eventuali nuovi tipi non ancora gestiti nel factory.
@@ -71,14 +74,31 @@ public class DomainFactory {
 
         // 2. Itera sui requisiti e controlla la mappa fornita.
         for (String key : requiredKeys) {
-            // Controlla sia la presenza della chiave che l'eventuale nullità del valore.
-            if (!params.containsKey(key) || params.get(key) == null) {
+            Double value = params.get(key);
+
+            // --- VALIDAZIONE 1: PRESENZA E NULLITÀ ---
+            // Controlla se il parametro è assente o se il valore è nullo.
+            if (!params.containsKey(key) || value == null) {
                 // Lancia un errore specifico e descrittivo
                 throw new IllegalArgumentException(
-                        "Missing parameter for the domain '" + type.getDisplayName() + "': " + key
+                        "Missing or null parameter for the domain '" + type.getDisplayName() + "': " + key
+                );
+            }
+
+            // --- VALIDAZIONE 2: VALORE POSITIVO ---
+            // Controlla che il valore sia strettamente maggiore di zero.
+            // Larghezza, altezza e raggio, ... devono essere > 0.
+            if (value <= 0) {
+                // Lancia un errore specifico se il valore è invalido (negativo o zero).
+                // teoricamente qua non ci si arriva mai, in quanto l'errore dato da valori non conformi
+                // è gestito precedentemente.
+                throw new IllegalArgumentException(
+                        "Invalid value for parameter '" + key + "' in domain '" + type.getDisplayName() + "'. " +
+                                "Value must be strictly positive (> 0). Found: " + value
                 );
             }
         }
-        // Nota: la validazione del valore (es. raggio > 0) è delegata al costruttore del Domain specifico
+        // La validazione del limite superiore (es. raggio max) resta delegata al codice chiamante (View/Controller)
+        // o al costruttore del Domain specifico per ragioni contestuali.
     }
 }

@@ -26,6 +26,10 @@ public class CircleDomain implements Domain {
      * * Scelta Implementativa: Il controllo all'inizio garantisce che l'oggetto sia sempre valido.
      */
     public CircleDomain(double radius) {
+
+        // Validazione di Integrità (Deep Defense):
+        // Nonostante i controlli "fail-fast" nel Factory/Controller,
+        // il costruttore garantisce che l'oggetto non sia mai creato in uno stato illegale.
         if (radius <= 0) {
             throw new IllegalArgumentException("The radius must be positive");
         }
@@ -55,6 +59,12 @@ public class CircleDomain implements Domain {
         return !((x * x + y * y) <= (radius * radius));
     }
 
+    /**
+     * Verifica se un intero individuo (tutti i suoi punti) rispetta il vincolo di confine.
+     * Complessità: O(N), dove N è il numero di punti nell'individuo.
+     * @param individual L'individuo da validare.
+     * @return True se tutti i punti sono all'interno del cerchio.
+     */
     @Override
     public boolean isValidIndividual(Individual individual) {
         List<Point> points = individual.getChromosomes();

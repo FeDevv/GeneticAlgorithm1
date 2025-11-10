@@ -23,7 +23,9 @@ public enum DomainType {
     // Dominio Circolare, richiede solo il raggio.
     CIRCLE(1,"CIRCLE", List.of("radius")),
     // Dominio Rettangolare, richiede larghezza e altezza.
-    RECTANGLE(2,"RECTANGLE", List.of("width", "height"));
+    RECTANGLE(2,"RECTANGLE", List.of("width", "height")),
+    // Dominio quadrato, richiede solo il lato
+    SQUARE (3, "SQUARE", List.of("side"));
 
     // ------------------- ATTRIBUTI -------------------
 

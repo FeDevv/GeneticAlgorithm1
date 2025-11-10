@@ -7,7 +7,7 @@ import model.domains.Domain;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-public class RectangularDomain implements Domain {
+public class RectangleDomain implements Domain {
 
     // ------------------- ATTRIBUTI -------------------
 
@@ -27,7 +27,15 @@ public class RectangularDomain implements Domain {
      * Il rettangolo va da [-width/2, width/2] sull'asse X e da [-height/2, height/2] sull'asse Y.
      * Questo semplifica il ragionamento sui confini e rende il dominio neutrale rispetto al quadrante.
      */
-    public RectangularDomain(double width, double height) {
+    public RectangleDomain(double width, double height) {
+
+        // Validazione di Integrità (Deep Defense):
+        // Nonostante i controlli "fail-fast" nel Factory/Controller,
+        // il costruttore garantisce che l'oggetto non sia mai creato in uno stato illegale.
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("The width and height must be both positive");
+        }
+
         // I campi sono final, garantendo l'immutabilità del dominio.
         this.width = width;
         this.height = height;
@@ -52,6 +60,12 @@ public class RectangularDomain implements Domain {
                 (y >= -height / 2) && (y <= height / 2));
     }
 
+    /**
+     * Verifica se un intero individuo (tutti i suoi punti) rispetta il vincolo di confine.
+     * Complessità: O(N), dove N è il numero di punti nell'individuo.
+     * @param individual L'individuo da validare.
+     * @return True se tutti i punti sono all'interno del rettangolo.
+     */
     @Override
     public boolean isValidIndividual(Individual individual) {
         List<Point> points = individual.getChromosomes();

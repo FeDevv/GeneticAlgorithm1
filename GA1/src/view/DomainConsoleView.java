@@ -46,6 +46,7 @@ public class DomainConsoleView {
      * @return L'ID numerico selezionato dall'utente (0 per uscire).
      */
     public int readMenuChoice() {
+        // da far prendere solo valori positivi
         System.out.print("Enter your choice: ");
         while (!scanner.hasNextInt()) {
             System.err.println("Invalid input. Please enter an integer");
@@ -65,7 +66,7 @@ public class DomainConsoleView {
     public Map<String, Double> readParameters(List<String> keys, String domainName) {
         Map<String, Double> params = new HashMap<>();
         System.out.println("\n--- Parameter Entry for " + domainName + " ---");
-
+        // da far prendere solo valori positivi
         for (String key : keys) {
             while (true) {
                 System.out.print("Enter the value for '" + key + "': ");
