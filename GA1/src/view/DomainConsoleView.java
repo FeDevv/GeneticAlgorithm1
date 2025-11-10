@@ -33,6 +33,8 @@ public class DomainConsoleView {
 
     /**
      * Visualizza un messaggio di errore.
+     * System.err e System.out non sono Sincronizzati!!!!
+     * Questa funzione la tengo per errori deep, e non errori della view!
      * @param msg Il messaggio di errore da mostrare.
      */
     public void showError(String msg) {
@@ -54,7 +56,7 @@ public class DomainConsoleView {
             // --- 1. Controllo del Tipo (Must be an integer) ---
             // Continua a ciclare finché lo scanner non trova un intero
             while (!scanner.hasNextInt()) {
-                showError("Invalid input. Please enter an integer.");
+                System.out.println("\n❌Non-numeric value. Please enter an integer.");
                 scanner.next(); // Scarta l'input non valido (es. testo)
                 System.out.print("Enter your choice: ");
             }
@@ -64,7 +66,7 @@ public class DomainConsoleView {
 
             // --- 2. Controllo del Valore (Must be positive: > 0) ---
             if (choice <= 0) {
-                showError("Invalid choice. Please enter a positive integer (> 0).");
+                System.out.println("\n❌Invalid choice. Please enter a positive integer (> 0).");
                 // Il ciclo 'do-while' si ripeterà grazie alla condizione esterna.
             }
 
@@ -96,7 +98,7 @@ public class DomainConsoleView {
 
                     // 2. Controllo Valore (Non positivo)
                     if (value <= 0) {
-                        showError("Invalid value. The parameter '" + key + "' must be strictly positive (> 0). Retry.");
+                        System.out.println("\n❌Invalid value. The parameter '" + key + "' must be strictly positive (> 0). Retry.");
                         // Il loop 'while (value <= 0)' si ripete
                     } else {
                         // Valore valido trovato
@@ -105,7 +107,7 @@ public class DomainConsoleView {
                     }
                 } else {
                     // Errore di tipo
-                    showError("Non-numeric value. Retry.");
+                    System.out.println("\n❌Non-numeric value. Retry.");
                     scanner.next(); // Scarta l'input non valido
                 }
             }

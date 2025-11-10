@@ -34,13 +34,23 @@ public class Main {
 
 
         // prendi la dimensione dell'individuo (quante piante da piantare?)
+        // Il tuo codice aggiornato
         while (individualSize <= 0) {
             System.out.print("Define the genome length (number of Points, positive integer): ");
+
+            // 1. Controlla se l'input è un intero
             if (scanner.hasNextInt()) {
                 individualSize = scanner.nextInt();
+
+                // **AGGIUNTA:** Controlla se il valore è positivo
+                if (individualSize <= 0) {
+                    System.out.println("❌ Error: The genome length must be a positive integer (> 0). Retry.");
+                    // Il loop esterno 'while (individualSize <= 0)' si ripete
+                }
+
             } else {
-                System.out.println("Invalid Input. Retry.");
-                scanner.next();
+                System.out.println("❌ Invalid Input. Please enter a positive integer. Retry.");
+                scanner.next(); // Scarta l'input non valido (non numerico)
             }
         }
 
