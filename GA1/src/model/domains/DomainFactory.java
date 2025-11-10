@@ -1,6 +1,7 @@
 package model.domains;
 
 import model.domains.types.CircleDomain;
+import model.domains.types.EllipseDomain;
 import model.domains.types.RectangleDomain;
 import model.domains.types.SquareDomain;
 
@@ -50,6 +51,8 @@ public class DomainFactory {
                 new RectangleDomain(params.get("width"), params.get("height"));
             case SQUARE ->
                 new SquareDomain(params.get("side"));
+            case ELLIPSE ->
+                new EllipseDomain(params.get("semi-width"), params.get("semi-height"));
             /*
             default ->
                 // Meccanismo di sicurezza: Cattura eventuali nuovi tipi non ancora gestiti nel factory.

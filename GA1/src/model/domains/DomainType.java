@@ -25,7 +25,9 @@ public enum DomainType {
     // Dominio Rettangolare, richiede larghezza e altezza.
     RECTANGLE(2,"RECTANGLE", List.of("width", "height")),
     // Dominio quadrato, richiede solo il lato
-    SQUARE (3, "SQUARE", List.of("side"));
+    SQUARE (3, "SQUARE", List.of("side")),
+    //Dominio ellittico, richiede i due semiassi
+    ELLIPSE(4, "ELLIPSE", List.of("semi-width", "semi-height"));
 
     // ------------------- ATTRIBUTI -------------------
 

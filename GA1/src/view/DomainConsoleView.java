@@ -46,14 +46,31 @@ public class DomainConsoleView {
      * @return L'ID numerico selezionato dall'utente (0 per uscire).
      */
     public int readMenuChoice() {
-        // da far prendere solo valori positivi
-        System.out.print("Enter your choice: ");
-        while (!scanner.hasNextInt()) {
-            System.err.println("Invalid input. Please enter an integer");
-            scanner.next(); // scarta input errato
-            System.out.print(">> ");
-        }
-        return scanner.nextInt();
+        int choice = -1; // Inizializzato a un valore non valido
+
+        do {
+            System.out.print("Enter your choice: ");
+
+            // --- 1. Controllo del Tipo (Must be an integer) ---
+            // Continua a ciclare finché lo scanner non trova un intero
+            while (!scanner.hasNextInt()) {
+                showError("Invalid input. Please enter an integer.");
+                scanner.next(); // Scarta l'input non valido (es. testo)
+                System.out.print("Enter your choice: ");
+            }
+
+            // Legge il valore
+            choice = scanner.nextInt();
+
+            // --- 2. Controllo del Valore (Must be positive: > 0) ---
+            if (choice <= 0) {
+                showError("Invalid choice. Please enter a positive integer (> 0).");
+                // Il ciclo 'do-while' si ripeterà grazie alla condizione esterna.
+            }
+
+        } while (choice <= 0); // Continua a ciclare finché la scelta non è strettamente positiva
+
+        return choice;
     }
 
     /**
@@ -66,16 +83,30 @@ public class DomainConsoleView {
     public Map<String, Double> readParameters(List<String> keys, String domainName) {
         Map<String, Double> params = new HashMap<>();
         System.out.println("\n--- Parameter Entry for " + domainName + " ---");
-        // da far prendere solo valori positivi
+
         for (String key : keys) {
-            while (true) {
-                System.out.print("Enter the value for '" + key + "': ");
+            double value;
+
+            while (true) { // Cicla finché non ottieni un valore strettamente positivo
+                System.out.print("Enter the value for '" + key + "' (must be > 0): ");
+
+                // 1. Controllo Tipo (Non numerico)
                 if (scanner.hasNextDouble()) {
-                    params.put(key, scanner.nextDouble());
-                    break;
+                    value = scanner.nextDouble();
+
+                    // 2. Controllo Valore (Non positivo)
+                    if (value <= 0) {
+                        showError("Invalid value. The parameter '" + key + "' must be strictly positive (> 0). Retry.");
+                        // Il loop 'while (value <= 0)' si ripete
+                    } else {
+                        // Valore valido trovato
+                        params.put(key, value);
+                        break;
+                    }
                 } else {
-                    System.err.println("Non-numeric value. Retry.");
-                    scanner.next();
+                    // Errore di tipo
+                    showError("Non-numeric value. Retry.");
+                    scanner.next(); // Scarta l'input non valido
                 }
             }
         }
