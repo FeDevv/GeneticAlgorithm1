@@ -1,9 +1,6 @@
 package model.domains;
 
-import model.domains.types.CircleDomain;
-import model.domains.types.EllipseDomain;
-import model.domains.types.RectangleDomain;
-import model.domains.types.SquareDomain;
+import model.domains.types.*;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +50,12 @@ public class DomainFactory {
                 new SquareDomain(params.get("side"));
             case ELLIPSE ->
                 new EllipseDomain(params.get("semi-width"), params.get("semi-height"));
+            case RIGHT_ANGLED_TRIANGLE ->
+                new RightAngledTriangle(params.get("base"), params.get("height"));
+            case FRAME ->
+                new FrameDomain(params.get("innerWidth"), params.get("innerHeight"), params.get("outerWidth"), params.get("outherHeight"));
+            case ANNULUS ->
+                new AnnulusDomain(params.get("innerRadius"), params.get("outerRadius"));
             /*
             default ->
                 // Meccanismo di sicurezza: Cattura eventuali nuovi tipi non ancora gestiti nel factory.

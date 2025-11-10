@@ -26,8 +26,14 @@ public enum DomainType {
     RECTANGLE(2,"RECTANGLE", List.of("width", "height")),
     // Dominio quadrato, richiede solo il lato
     SQUARE (3, "SQUARE", List.of("side")),
-    //Dominio ellittico, richiede i due semiassi
-    ELLIPSE(4, "ELLIPSE", List.of("semi-width", "semi-height"));
+    //Dominio ellittico, richiede i due semiassi (la width è sull'asse x, la height sull'asse y)
+    ELLIPSE(4, "ELLIPSE", List.of("semi-width", "semi-height")),
+    //Dominio di triangolo rettangolo, richiede i due cateti, o base (sull'asse x a partire da (0,0)) e altezza (sull'asse y a partire da (0,0))
+    RIGHT_ANGLED_TRIANGLE(5, "RIGHT ANGLED TRIANGLE", List.of("base", "height")),
+    //Dominio a "frame", o cornice, richiede le dimensioni per i due rettangoli
+    FRAME(6, "FRAME", List.of("innerWidth", "innerHeight","outerWidth", "outherHeight")),
+    //Dominio a corona circolare, o annulus, richiede i raggi della circonferenza esterna e di quella interna
+    ANNULUS(7, "ANNULUS", List.of("innerRadius", "outerRadius"));
 
     // ------------------- ATTRIBUTI -------------------
 
