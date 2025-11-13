@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3fe2a0c6-7229-4137-ae75-ca7723f4e441" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GeneticAlgorithm1.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/controllers/DomainController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/controllers/EvolutionEngine.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/exceptions/MaxAttemptsExceededException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/Individual.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/Point.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/Domain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/DomainFactory$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/DomainFactory.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/DomainType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/types/AnnulusDomain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/types/CircleDomain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/types/EllipseDomain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/types/FrameDomain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/types/RectangleDomain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/types/RightAngledTriangle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/model/domains/types/SquareDomain.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/Crossover.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/FitnessCalculator.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/Mutation.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/Selection.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/strategies/OverlapQuadratic.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/strategies/OverlapSpatial$Cell.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/strategies/OverlapSpatial.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/service/strategies/OverlapStrategy.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/utils/DistanceCalculator.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/utils/PenaltyHelper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/utils/RandomUtils.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/view/DomainConsoleView.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/GeneticAlgorithm1/view/EvolutionConsoleView.class" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="35QdtJMMYAiE1zFFmx0Enr57o8n" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/ricobon/Documents/Uni/ISPW/GeneticAlgorithm",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="GeneticAlgorithm1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="GeneticAlgorithm1" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.27397.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.27397.103" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3fe2a0c6-7229-4137-ae75-ca7723f4e441" name="Changes" comment="" />
+      <created>1763046443461</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1763046443461</updated>
+      <workItem from="1763046445072" duration="132000" />
+      <workItem from="1763046735291" duration="245000" />
+      <workItem from="1763047364932" duration="22000" />
+      <workItem from="1763047734740" duration="97000" />
+      <workItem from="1763047876451" duration="21000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
