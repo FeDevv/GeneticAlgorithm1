@@ -64,13 +64,13 @@ public class DomainConsoleView {
             // Legge il valore
             choice = scanner.nextInt();
 
-            // --- 2. Controllo del Valore (Must be positive: > 0) ---
-            if (choice <= 0) {
-                System.out.println("\n❌Invalid choice. Please enter a positive integer (> 0).");
+            // --- 2. Controllo del Valore (Must be non-negative: >= 0) ---
+            if (choice < 0) {
+                System.out.println("\n❌Invalid choice. Please enter a non negative integer (>= 0).");
                 // Il ciclo 'do-while' si ripeterà grazie alla condizione esterna.
             }
 
-        } while (choice <= 0); // Continua a ciclare finché la scelta non è strettamente positiva
+        } while (choice < 0); // Continua a ciclare finché la scelta non è strettamente positiva
 
         return choice;
     }
