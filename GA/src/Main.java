@@ -28,7 +28,7 @@ public class Main {
         if (domainOptional.isPresent()) {
             problemDomain = domainOptional.get();
         } else {
-            System.out.println("Domain creation canceled or failed.");
+            System.out.println("\nDomain creation canceled or failed.");
             return;
         }
 
